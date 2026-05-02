@@ -4,7 +4,7 @@
 // ============================================
 
 const CONFIG = {
-  API_URL: 'https://yourdomain.com/api',  // cPanel এ যে URL দেবেন
+  API_URL: 'https://kyra.shohozvibe.com/api',  // cPanel এ যে URL দেবেন
   SITE_NAME: 'কায়রা ফাউন্ডেশন',
 };
 
