@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>সেটিংস - অ্যাডমিন</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css"><link rel="stylesheet" href="admin.css">
+</head>
+<body class="admin-body">
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo"><div style="background:linear-gradient(135deg,var(--green-light),var(--green-bright));border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Noto Serif Bengali',serif;font-size:20px;font-weight:900;color:white;width:38px;height:38px;flex-shrink:0;">ক</div><div><div style="font-weight:700;font-size:14px;color:white">কায়রা ফাউন্ডেশন</div></div></div>
+  <nav class="sidebar-nav">
+    <a href="dashboard.html" class="sidebar-link">🏠 ড্যাশবোর্ড</a>
+    <a href="projects.html" class="sidebar-link">📋 প্রকল্পসমূহ</a>
+    <a href="events.html" class="sidebar-link">📅 ইভেন্ট</a>
+    <a href="team.html" class="sidebar-link">👥 টিম মেম্বার</a>
+    <a href="gallery.html" class="sidebar-link">🖼️ গ্যালারি</a>
+    <a href="partners.html" class="sidebar-link">🤝 অংশীদার</a>
+    <a href="volunteers.html" class="sidebar-link">🙋 স্বেচ্ছাসেবক</a>
+    <a href="messages.html" class="sidebar-link">✉️ বার্তা</a>
+    <a href="donations.html" class="sidebar-link">💚 ডোনেশন</a>
+    <a href="settings.html" class="sidebar-link active">⚙️ সেটিংস</a>
+  </nav>
+  <div class="sidebar-footer"><div class="admin-info"><div class="admin-avatar">A</div><div><div id="adminName" style="font-size:14px;font-weight:600;color:white"></div></div></div><button onclick="logout()" class="logout-btn">লগআউট</button></div>
+</aside>
+
+<main class="admin-main">
+  <div class="admin-header">
+    <div><h1 class="admin-title">সাইট সেটিংস</h1><p class="admin-subtitle">ওয়েবসাইটের তথ্য আপডেট করুন</p></div>
+    <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+  </div>
+
+  <div class="admin-card">
+    <form id="settingsForm">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="admin-form-group"><label>সংগঠনের নাম</label><input type="text" id="site_name"></div>
+        <div class="admin-form-group"><label>স্লোগান</label><input type="text" id="site_slogan"></div>
+        <div class="admin-form-group"><label>ইমেইল</label><input type="email" id="site_email"></div>
+        <div class="admin-form-group"><label>ফোন</label><input type="text" id="site_phone"></div>
+        <div class="admin-form-group" style="grid-column:span 2"><label>ঠিকানা</label><input type="text" id="site_address"></div>
+        <div class="admin-form-group"><label>Facebook URL</label><input type="url" id="facebook_url"></div>
+        <div class="admin-form-group"><label>প্রতিষ্ঠার বছর</label><input type="number" id="founded_year"></div>
+        <div class="admin-form-group"><label>মোট স্বেচ্ছাসেবক</label><input type="number" id="total_volunteers"></div>
+        <div class="admin-form-group"><label>মোট প্রকল্প</label><input type="number" id="total_projects"></div>
+        <div class="admin-form-group"><label>মোট উপকারভোগী</label><input type="number" id="total_beneficiaries"></div>
+      </div>
+      <div style="margin-top:8px">
+        <button type="submit" class="admin-btn">💾 সেটিংস সংরক্ষণ করুন</button>
+      </div>
+    </form>
+  </div>
+</main>
+
+<div class="toast"></div>
+<script src="../js/config.js"></script><script src="admin.js"></script>
+<script>
+const SETTING_KEYS = ['site_name','site_slogan','site_email','site_phone','site_address','facebook_url','founded_year','total_volunteers','total_projects','total_beneficiaries'];
+document.addEventListener('DOMContentLoaded', async () => {
+  requireAdminAuth(); loadAdminUser();
+  try {
+    const data = await adminFetch('/admin/settings');
+    if (data.success) {
+      SETTING_KEYS.forEach(k => { const el = document.getElementById(k); if (el && data.data[k]) el.value = data.data[k]; });
+    }
+  } catch(e) {}
+});
+
+document.getElementById('settingsForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const updates = {};
+  SETTING_KEYS.forEach(k => { const el = document.getElementById(k); if (el) updates[k] = el.value; });
+  const res = await adminFetch('/admin/settings', { method: 'PUT', body: JSON.stringify(updates) });
+  if (res.success) showToast('সেটিংস সংরক্ষিত হয়েছে ✓');
+  else showToast('সংরক্ষণ ব্যর্থ', 'error');
+});
+</script>
+</body></html>
