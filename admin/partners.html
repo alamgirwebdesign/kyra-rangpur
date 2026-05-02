@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>অংশীদার - অ্যাডমিন</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css"><link rel="stylesheet" href="admin.css">
+</head>
+<body class="admin-body">
+<div id="sidebar-placeholder"></div>
+<main class="admin-main">
+  <div class="admin-header">
+    <div><h1 class="admin-title">অংশীদার প্রতিষ্ঠান</h1><p class="admin-subtitle">সহযোগী প্রতিষ্ঠান ও ব্যক্তিবর্গ পরিচালনা</p></div>
+    <div style="display:flex;gap:10px">
+      <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+      <button class="admin-btn" onclick="openModal('partnerModal')">+ নতুন অংশীদার</button>
+    </div>
+  </div>
+  <div class="admin-card">
+    <div class="table-wrapper">
+      <table class="admin-table">
+        <thead><tr><th>নাম</th><th>ওয়েবসাইট</th><th>সংক্ষিপ্ত তথ্য</th><th>ক্রম</th><th>কর্ম</th></tr></thead>
+        <tbody id="partnersTable"><tr><td colspan="5" class="loading-placeholder">লোড হচ্ছে...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<!-- Modal -->
+<div class="modal-overlay" id="partnerModal">
+  <div class="modal-box" style="max-width:500px">
+    <div class="modal-header">
+      <h3 id="partnerModalTitle">নতুন অংশীদার</h3>
+      <button class="modal-close" onclick="closeModal('partnerModal')">✕</button>
+    </div>
+    <form id="partnerForm">
+      <input type="hidden" id="editPartnerId">
+      <div class="admin-form-group"><label>প্রতিষ্ঠানের নাম *</label><input type="text" id="ptName" required></div>
+      <div class="admin-form-group"><label>ওয়েবসাইট</label><input type="url" id="ptWebsite" placeholder="https://"></div>
+      <div class="admin-form-group"><label>সংক্ষিপ্ত তথ্য</label><input type="text" id="ptInfo" placeholder="সংক্ষেপে বর্ণনা করুন"></div>
+      <div class="form-row">
+        <div class="admin-form-group"><label>ক্রম নম্বর</label><input type="number" id="ptOrder" value="0" min="0"></div>
+      </div>
+      <div class="admin-form-group"><label>লোগো ছবি</label><input type="file" id="ptLogo" accept="image/*"></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button type="button" class="admin-btn secondary" onclick="closeModal('partnerModal')">বাতিল</button>
+        <button type="submit" class="admin-btn">সংরক্ষণ</button>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="toast"></div>
+<script src="../js/config.js"></script>
+<script src="admin.js"></script>
+<script src="sidebar.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => { initAdminPage('partners'); loadPartners(); });
+
+async function loadPartners() {
+  const tbody = document.getElementById('partnersTable');
+  try {
+    const data = await adminFetch('/admin/partners');
+    if (!data.success) throw new Error();
+    tbody.innerHTML = data.data.map(p => `
+      <tr>
+        <td><strong>${p.name}</strong></td>
+        <td>${p.website ? `<a href="${p.website}" target="_blank" style="color:var(--green-light)">${p.website.replace('https://','')}</a>` : '-'}</td>
+        <td style="max-width:200px;font-size:13px">${p.short_info || '-'}</td>
+        <td>${p.sort_order}</td>
+        <td>
+          <button class="admin-btn" style="padding:6px 14px;font-size:12px" onclick='editPartner(${JSON.stringify(p).replace(/'/g,"&#39;")})'>সম্পাদনা</button>
+          <button class="admin-btn danger" style="padding:6px 14px;font-size:12px;margin-left:6px" onclick="deletePartner(${p.id})">মুছুন</button>
+        </td>
+      </tr>`).join('') || '<tr><td colspan="5" class="loading-placeholder">কোনো অংশীদার নেই</td></tr>';
+  } catch(e) { tbody.innerHTML = '<tr><td colspan="5" class="loading-placeholder">লোড ব্যর্থ</td></tr>'; }
+}
+
+function editPartner(p) {
+  document.getElementById('partnerModalTitle').textContent = 'অংশীদার সম্পাদনা';
+  document.getElementById('editPartnerId').value = p.id;
+  document.getElementById('ptName').value = p.name;
+  document.getElementById('ptWebsite').value = p.website || '';
+  document.getElementById('ptInfo').value = p.short_info || '';
+  document.getElementById('ptOrder').value = p.sort_order || 0;
+  openModal('partnerModal');
+}
+
+async function deletePartner(id) {
+  confirmDelete('এই অংশীদারকে মুছে ফেলতে চান?', async () => {
+    const res = await adminFetch(`/admin/partners?id=${id}`, { method: 'DELETE' });
+    if (res.success) { showToast('অংশীদার মুছে ফেলা হয়েছে'); loadPartners(); }
+    else showToast('মুছতে ব্যর্থ', 'error');
+  });
+}
+
+document.getElementById('partnerForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const id = document.getElementById('editPartnerId').value;
+  const data = { id, name: document.getElementById('ptName').value, website: document.getElementById('ptWebsite').value, short_info: document.getElementById('ptInfo').value, sort_order: document.getElementById('ptOrder').value };
+  const res = await adminFetch('/admin/partners', { method: id ? 'PUT' : 'POST', body: JSON.stringify(data) });
+  if (res.success) { showToast(id ? 'আপডেট হয়েছে' : 'অংশীদার যোগ হয়েছে'); closeModal('partnerModal'); loadPartners(); document.getElementById('editPartnerId').value = ''; }
+  else showToast('সংরক্ষণ ব্যর্থ', 'error');
+});
+</script>
+</body>
+</html>

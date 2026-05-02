@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>প্রকল্পসমূহ - কায়রা ফাউন্ডেশন</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Noto+Serif+Bengali:wght@400;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<div id="navbar-placeholder"></div>
+
+<section class="page-hero">
+  <div class="container">
+    <div class="breadcrumb"><a href="../index.html">হোম</a> → প্রকল্পসমূহ</div>
+    <h1>আমাদের প্রকল্পসমূহ</h1>
+    <p>রংপুর বিভাগজুড়ে পরিচালিত চলমান ও সম্পন্ন প্রকল্পের বিস্তারিত</p>
+  </div>
+</section>
+
+<section style="padding:70px 0;background:var(--off-white)">
+  <div class="container">
+    <!-- Stats -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:48px" id="projectStats">
+      <div style="background:white;border-radius:var(--radius-md);padding:24px;text-align:center;box-shadow:var(--shadow-sm);border-left:4px solid var(--green-light)">
+        <div style="font-size:32px;font-weight:700;color:var(--green-dark);font-family:'Noto Serif Bengali',serif" id="totalProjects">-</div>
+        <div style="font-size:13px;color:var(--text-secondary);margin-top:4px">মোট প্রকল্প</div>
+      </div>
+      <div style="background:white;border-radius:var(--radius-md);padding:24px;text-align:center;box-shadow:var(--shadow-sm);border-left:4px solid var(--gold)">
+        <div style="font-size:32px;font-weight:700;color:var(--green-dark);font-family:'Noto Serif Bengali',serif" id="ongoingProjects">-</div>
+        <div style="font-size:13px;color:var(--text-secondary);margin-top:4px">চলমান</div>
+      </div>
+      <div style="background:white;border-radius:var(--radius-md);padding:24px;text-align:center;box-shadow:var(--shadow-sm);border-left:4px solid var(--green-bright)">
+        <div style="font-size:32px;font-weight:700;color:var(--green-dark);font-family:'Noto Serif Bengali',serif" id="completedProjects">-</div>
+        <div style="font-size:13px;color:var(--text-secondary);margin-top:4px">সম্পন্ন</div>
+      </div>
+      <div style="background:white;border-radius:var(--radius-md);padding:24px;text-align:center;box-shadow:var(--shadow-sm);border-left:4px solid #a29bfe">
+        <div style="font-size:32px;font-weight:700;color:var(--green-dark);font-family:'Noto Serif Bengali',serif" id="totalBeneficiaries">-</div>
+        <div style="font-size:13px;color:var(--text-secondary);margin-top:4px">উপকারভোগী</div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:32px;align-items:center">
+      <div class="filter-bar" id="statusFilters">
+        <button class="filter-btn active" data-filter="status" data-value="">সব</button>
+        <button class="filter-btn" data-filter="status" data-value="ongoing">চলমান</button>
+        <button class="filter-btn" data-filter="status" data-value="completed">সম্পন্ন</button>
+        <button class="filter-btn" data-filter="status" data-value="upcoming">আসন্ন</button>
+      </div>
+      <div class="filter-bar" id="catFilters">
+        <button class="filter-btn active" data-filter="category" data-value="">সব ক্যাটাগরি</button>
+        <button class="filter-btn" data-filter="category" data-value="education">📚 শিক্ষা</button>
+        <button class="filter-btn" data-filter="category" data-value="health">🏥 স্বাস্থ্য</button>
+        <button class="filter-btn" data-filter="category" data-value="poverty">🌾 দারিদ্র্য বিমোচন</button>
+        <button class="filter-btn" data-filter="category" data-value="environment">🌿 পরিবেশ</button>
+      </div>
+    </div>
+
+    <!-- Projects Grid -->
+    <div class="projects-grid" id="projectsGrid">
+      <div class="project-skeleton"></div>
+      <div class="project-skeleton"></div>
+      <div class="project-skeleton"></div>
+    </div>
+    <div id="noResults" style="display:none;text-align:center;padding:60px 20px;color:var(--text-secondary)">
+      <div style="font-size:48px;margin-bottom:16px">🔍</div>
+      <p>এই ফিল্টারে কোনো প্রকল্প পাওয়া যায়নি।</p>
+    </div>
+  </div>
+</section>
+
+<div id="footer-placeholder"></div>
+<script src="../js/config.js"></script>
+<script src="../js/components.js"></script>
+<script>
+initSharedComponents('projects');
+let allProjects = [];
+let activeStatus = '', activeCategory = '';
+
+document.addEventListener('DOMContentLoaded', () => { loadProjects(); });
+
+async function loadProjects() {
+  try {
+    const res = await API.get('/projects');
+    if (!res.success) throw new Error();
+    allProjects = res.data;
+    updateStats();
+    renderProjects();
+  } catch(e) {
+    allProjects = [
+      { id:1, title:'শিক্ষা আলো প্রকল্প', category:'education', short_desc:'সুবিধাবঞ্চিত শিশুদের বিনামূল্যে শিক্ষা কার্যক্রম ও স্কুল সামগ্রী বিতরণ।', status:'ongoing', location:'রংপুর', beneficiaries:2000, description:'রংপুর বিভাগের সুবিধাবঞ্চিত শিশুদের জন্য এই প্রকল্পের আওতায় বিনামূল্যে পাঠ্যপুস্তক, খাতা, কলম ও অন্যান্য স্কুল সামগ্রী বিতরণ করা হয়।' },
+      { id:2, title:'স্বাস্থ্য সেবা শিবির', category:'health', short_desc:'প্রত্যন্ত অঞ্চলে বিনামূল্যে চিকিৎসা সেবা ও ওষুধ বিতরণ।', status:'ongoing', location:'রংপুর বিভাগ', beneficiaries:5000 },
+      { id:3, title:'শীতবস্ত্র বিতরণ', category:'poverty', short_desc:'দরিদ্র পরিবারের মাঝে কম্বল ও শীতবস্ত্র বিতরণ।', status:'completed', location:'রংপুর, নীলফামারী, গাইবান্ধা', beneficiaries:3000 },
+      { id:4, title:'বৃক্ষরোপণ অভিযান', category:'environment', short_desc:'রংপুর বিভাগজুড়ে পরিবেশ সংরক্ষণে বৃক্ষরোপণ।', status:'completed', location:'রংপুর বিভাগ', beneficiaries:0 },
+      { id:5, title:'নারী দক্ষতা উন্নয়ন', category:'other', short_desc:'গ্রামীণ নারীদের জন্য সেলাই ও হস্তশিল্প প্রশিক্ষণ।', status:'ongoing', location:'গাইবান্ধা', beneficiaries:200 },
+      { id:6, title:'বন্যা ত্রাণ কার্যক্রম', category:'poverty', short_desc:'বন্যায় ক্ষতিগ্রস্ত পরিবারের মাঝে ত্রাণ বিতরণ।', status:'completed', location:'কুড়িগ্রাম, গাইবান্ধা', beneficiaries:8000 },
+    ];
+    updateStats();
+    renderProjects();
+  }
+}
+
+function updateStats() {
+  document.getElementById('totalProjects').textContent = allProjects.length;
+  document.getElementById('ongoingProjects').textContent = allProjects.filter(p => p.status === 'ongoing').length;
+  document.getElementById('completedProjects').textContent = allProjects.filter(p => p.status === 'completed').length;
+  const total = allProjects.reduce((sum, p) => sum + (parseInt(p.beneficiaries) || 0), 0);
+  document.getElementById('totalBeneficiaries').textContent = total.toLocaleString('bn-BD') + '+';
+}
+
+function renderProjects() {
+  const grid = document.getElementById('projectsGrid');
+  const noResults = document.getElementById('noResults');
+  let filtered = allProjects.filter(p => {
+    if (activeStatus && p.status !== activeStatus) return false;
+    if (activeCategory && p.category !== activeCategory) return false;
+    return true;
+  });
+  if (!filtered.length) {
+    grid.innerHTML = ''; noResults.style.display = 'block'; return;
+  }
+  noResults.style.display = 'none';
+  const icons = { education:'📚', health:'🏥', poverty:'🌾', environment:'🌿', other:'📌' };
+  grid.innerHTML = filtered.map(p => `
+    <div class="project-card fade-in">
+      <div class="project-img">
+        ${p.cover_image ? `<img src="${CONFIG.API_URL.replace('/api','')}/${p.cover_image}" alt="${p.title}">` : icons[p.category] || '📌'}
+        <span class="project-status ${STATUS_LABELS[p.status]?.class}">${STATUS_LABELS[p.status]?.label}</span>
+      </div>
+      <div class="project-body">
+        <div class="project-category">${CATEGORIES[p.category] || p.category}</div>
+        <h3>${p.title}</h3>
+        <p>${p.short_desc || ''}</p>
+        <div class="project-meta">
+          <span>📍 ${p.location || 'রংপুর'}</span>
+          <span>👥 ${Number(p.beneficiaries || 0).toLocaleString('bn-BD')}+</span>
+        </div>
+      </div>
+    </div>`).join('');
+  document.querySelectorAll('.fade-in').forEach(el => {
+    setTimeout(() => el.classList.add('visible'), 50);
+  });
+}
+
+// Filter buttons
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const filterType = btn.dataset.filter;
+    const value = btn.dataset.value;
+    document.querySelectorAll(`[data-filter="${filterType}"]`).forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    if (filterType === 'status') activeStatus = value;
+    if (filterType === 'category') activeCategory = value;
+    renderProjects();
+  });
+});
+</script>
+</body>
+</html>

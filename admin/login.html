@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>অ্যাডমিন লগইন - কায়রা ফাউন্ডেশন</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+body { background: linear-gradient(135deg, var(--green-dark) 0%, var(--green-mid) 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+.login-wrapper { width: 100%; max-width: 420px; padding: 20px; }
+.login-card { background: white; border-radius: var(--radius-lg); padding: 48px 40px; box-shadow: var(--shadow-lg); }
+.login-logo { text-align: center; margin-bottom: 32px; }
+.login-logo .logo-icon { width: 60px; height: 60px; font-size: 28px; margin: 0 auto 12px; }
+.login-logo h1 { font-size: 22px; color: var(--green-dark); }
+.login-logo p { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+.form-group { margin-bottom: 18px; }
+.form-group label { display: block; font-weight: 600; font-size: 14px; color: var(--text-primary); margin-bottom: 8px; }
+.form-group input { width: 100%; padding: 13px 16px; border: 2px solid #e0ece3; border-radius: var(--radius-sm); font-family: 'Hind Siliguri', sans-serif; font-size: 15px; outline: none; transition: var(--transition); }
+.form-group input:focus { border-color: var(--green-light); box-shadow: 0 0 0 4px rgba(64,145,108,0.1); }
+.login-btn { width: 100%; padding: 14px; background: var(--green-dark); color: white; border: none; border-radius: 50px; font-size: 16px; font-weight: 700; font-family: 'Hind Siliguri', sans-serif; cursor: pointer; transition: var(--transition); margin-top: 8px; }
+.login-btn:hover { background: var(--green-mid); }
+.login-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+.error-msg { background: #fff0f0; border: 1px solid #ffcccc; color: #c62828; padding: 12px 16px; border-radius: var(--radius-sm); font-size: 14px; margin-bottom: 16px; display: none; }
+.back-link { display: block; text-align: center; margin-top: 20px; color: var(--text-secondary); font-size: 14px; text-decoration: none; }
+.back-link:hover { color: var(--green-mid); }
+</style>
+</head>
+<body>
+<div class="login-wrapper">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-icon" style="background:linear-gradient(135deg,var(--green-light),var(--green-bright));border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'Noto Serif Bengali',serif;font-size:28px;font-weight:900;color:white;">ক</div>
+      <h1>কায়রা ফাউন্ডেশন</h1>
+      <p>অ্যাডমিন প্যানেল</p>
+    </div>
+
+    <div class="error-msg" id="errorMsg"></div>
+
+    <form id="loginForm">
+      <div class="form-group">
+        <label>ইমেইল</label>
+        <input type="email" id="loginEmail" placeholder="admin@kayrafoundation.org" required>
+      </div>
+      <div class="form-group">
+        <label>পাসওয়ার্ড</label>
+        <input type="password" id="loginPass" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="login-btn" id="loginBtn">লগইন করুন</button>
+    </form>
+    <a href="../index.html" class="back-link">← ওয়েবসাইটে ফিরে যান</a>
+  </div>
+</div>
+
+<script src="../js/config.js"></script>
+<script>
+// Redirect if already logged in
+if (API.getToken()) window.location.href = 'dashboard.html';
+
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('loginBtn');
+  const errorMsg = document.getElementById('errorMsg');
+  errorMsg.style.display = 'none';
+  btn.disabled = true; btn.textContent = 'যাচাই করা হচ্ছে...';
+
+  try {
+    const res = await API.post('/admin/login', {
+      email: document.getElementById('loginEmail').value,
+      password: document.getElementById('loginPass').value,
+    });
+    if (res.success) {
+      API.setToken(res.data.token);
+      localStorage.setItem('kayra_admin', JSON.stringify(res.data.user));
+      window.location.href = 'dashboard.html';
+    } else {
+      errorMsg.textContent = res.message || 'ইমেইল বা পাসওয়ার্ড সঠিক নয়।';
+      errorMsg.style.display = 'block';
+      btn.disabled = false; btn.textContent = 'লগইন করুন';
+    }
+  } catch(err) {
+    errorMsg.textContent = 'সার্ভার সংযোগে সমস্যা।';
+    errorMsg.style.display = 'block';
+    btn.disabled = false; btn.textContent = 'লগইন করুন';
+  }
+});
+</script>
+</body>
+</html>

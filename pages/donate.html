@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ডোনেট করুন - কায়রা ফাউন্ডেশন</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Noto+Serif+Bengali:wght@400;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css"><link rel="stylesheet" href="../css/pages.css">
+<style>
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-weight: 600; font-size: 14px; color: var(--text-primary); margin-bottom: 7px; }
+.form-group label span { color: var(--red-accent); }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 16px; border: 2px solid #e0ece3; border-radius: var(--radius-sm); font-family: 'Hind Siliguri', sans-serif; font-size: 15px; outline: none; transition: var(--transition); }
+.form-group input:focus, .form-group select:focus { border-color: var(--green-light); box-shadow: 0 0 0 4px rgba(64,145,108,0.1); }
+.custom-amount-wrapper { display: flex; align-items: center; border: 2px solid #e0ece3; border-radius: var(--radius-sm); overflow: hidden; transition: var(--transition); }
+.custom-amount-wrapper:focus-within { border-color: var(--green-light); }
+.custom-amount-wrapper span { padding: 12px 14px; background: var(--gray-light); font-weight: 700; color: var(--text-secondary); font-size: 16px; }
+.custom-amount-wrapper input { border: none; box-shadow: none; padding: 12px 16px; }
+.custom-amount-wrapper input:focus { box-shadow: none; }
+.donate-submit-btn { width: 100%; padding: 16px; background: var(--gold); color: var(--green-dark); border: none; border-radius: 50px; font-size: 18px; font-weight: 700; font-family: 'Hind Siliguri', sans-serif; cursor: pointer; transition: var(--transition); box-shadow: 0 4px 15px rgba(233,196,106,0.4); }
+.donate-submit-btn:hover { background: var(--gold-dark); color: white; transform: translateY(-2px); }
+.donate-submit-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+.payment-note { background: var(--green-bg); border: 1px solid var(--green-pale); border-radius: var(--radius-sm); padding: 14px; margin-top: 14px; font-size: 13px; color: var(--green-dark); line-height: 1.6; }
+.success-state { display: none; text-align: center; padding: 40px 20px; }
+.success-state .check-circle { width: 70px; height: 70px; background: var(--green-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 32px; }
+</style>
+</head>
+<body>
+<div id="navbar-placeholder"></div>
+
+<section class="page-hero">
+  <div class="container">
+    <div class="breadcrumb"><a href="../index.html">হোম</a> → ডোনেট করুন</div>
+    <h1>❤️ ডোনেট করুন</h1>
+    <p>আপনার সাহায্যে রংপুরের হাজারো মানুষের জীবন বদলে দেওয়া সম্ভব</p>
+  </div>
+</section>
+
+<section style="padding:80px 0;background:var(--off-white)">
+  <div class="container">
+    <div class="donate-grid">
+      <!-- Donate Form -->
+      <div style="background:white;border-radius:var(--radius-lg);padding:40px;box-shadow:var(--shadow-md);border:1px solid #e8f0ea">
+        <h2 style="font-size:26px;color:var(--green-dark);margin-bottom:6px">ডোনেশন করুন</h2>
+        <p style="color:var(--text-secondary);font-size:14px;margin-bottom:28px">আপনার সুবিধামতো পরিমাণ ও পেমেন্ট মেথড বেছে নিন</p>
+
+        <form id="donateForm">
+          <!-- Amount Selection -->
+          <div style="margin-bottom:20px">
+            <label style="display:block;font-weight:600;font-size:14px;color:var(--text-primary);margin-bottom:10px">পরিমাণ নির্বাচন করুন (৳)</label>
+            <div class="donate-amounts" id="amountBtns">
+              <button type="button" class="amount-btn" data-amount="100">৳ ১০০</button>
+              <button type="button" class="amount-btn" data-amount="250">৳ ২৫০</button>
+              <button type="button" class="amount-btn" data-amount="500">৳ ৫০০</button>
+              <button type="button" class="amount-btn active" data-amount="1000">৳ ১,০০০</button>
+              <button type="button" class="amount-btn" data-amount="2500">৳ ২,৫০০</button>
+              <button type="button" class="amount-btn" data-amount="5000">৳ ৫,০০০</button>
+            </div>
+            <div style="margin-top:12px">
+              <label style="font-size:13px;color:var(--text-secondary);margin-bottom:6px;display:block">অথবা নিজে লিখুন:</label>
+              <div class="custom-amount-wrapper">
+                <span>৳</span>
+                <input type="number" id="customAmount" placeholder="পরিমাণ লিখুন" min="10">
+              </div>
+            </div>
+          </div>
+
+          <!-- Payment Method -->
+          <div style="margin-bottom:20px">
+            <label style="display:block;font-weight:600;font-size:14px;color:var(--text-primary);margin-bottom:10px">পেমেন্ট মেথড <span style="color:var(--red-accent)">*</span></label>
+            <div class="payment-methods">
+              <div class="payment-method active" data-method="bkash">
+                <div class="pm-icon">💳</div>
+                <div class="pm-name">bKash</div>
+                <div class="pm-num">01XXX-XXXXXX</div>
+              </div>
+              <div class="payment-method" data-method="nagad">
+                <div class="pm-icon">📱</div>
+                <div class="pm-name">Nagad</div>
+                <div class="pm-num">01XXX-XXXXXX</div>
+              </div>
+              <div class="payment-method" data-method="rocket">
+                <div class="pm-icon">🚀</div>
+                <div class="pm-name">Rocket</div>
+                <div class="pm-num">01XXX-XXXXXX</div>
+              </div>
+              <div class="payment-method" data-method="bank">
+                <div class="pm-icon">🏦</div>
+                <div class="pm-name">ব্যাংক ট্রান্সফার</div>
+                <div class="pm-num">সংযোগ করুন</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Donor Info -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div class="form-group"><label>আপনার নাম</label><input type="text" name="donor_name" placeholder="নাম (ঐচ্ছিক)"></div>
+            <div class="form-group"><label>ফোন নম্বর</label><input type="tel" name="donor_phone" placeholder="01XXXXXXXXX"></div>
+          </div>
+          <div class="form-group">
+            <label>ট্রানজেকশন আইডি <span style="color:var(--red-accent)">*</span></label>
+            <input type="text" name="transaction_id" placeholder="পেমেন্টের পর Transaction ID দিন" required>
+          </div>
+          <div class="form-group">
+            <label>বিশেষ বার্তা</label>
+            <input type="text" name="note" placeholder="কোনো বিশেষ নির্দেশনা (ঐচ্ছিক)">
+          </div>
+
+          <button type="submit" class="donate-submit-btn" id="donateBtn">❤️ ডোনেশন নিশ্চিত করুন</button>
+
+          <div class="payment-note">
+            ℹ️ <strong>নির্দেশনা:</strong> প্রথমে উপরে পেমেন্ট মেথড সিলেক্ট করুন, সেখানে দেওয়া নম্বরে পেমেন্ট করুন, তারপর ট্রানজেকশন আইডি এখানে দিয়ে সাবমিট করুন। আমাদের টিম যাচাই করে আপনার সাথে যোগাযোগ করবে।
+          </div>
+        </form>
+
+        <div class="success-state" id="donateSuccess">
+          <div class="check-circle">✅</div>
+          <h3 style="font-size:22px;color:var(--green-dark);margin-bottom:8px">ডোনেশন তথ্য গ্রহণ করা হয়েছে!</h3>
+          <p style="color:var(--text-secondary)">আমাদের টিম যাচাই করে আপনার সাথে যোগাযোগ করবে। আপনার উদারতার জন্য আন্তরিক ধন্যবাদ!</p>
+          <a href="../index.html" class="btn-outline" style="display:inline-flex;margin-top:20px">← হোমে ফিরুন</a>
+        </div>
+      </div>
+
+      <!-- Impact Info -->
+      <div>
+        <div class="donate-impact-card">
+          <h3>আপনার ডোনেশনের প্রভাব</h3>
+          <div class="impact-item">
+            <div class="impact-amount">৳ ১০০</div>
+            <div class="impact-desc">একজন শিশুর জন্য এক মাসের খাতা-কলম কিনে দেওয়া যায়।</div>
+          </div>
+          <div class="impact-item">
+            <div class="impact-amount">৳ ৫০০</div>
+            <div class="impact-desc">একটি পরিবারের জন্য শীতের কম্বল ও প্রয়োজনীয় পোশাক দেওয়া সম্ভব।</div>
+          </div>
+          <div class="impact-item">
+            <div class="impact-amount">৳ ১,০০০</div>
+            <div class="impact-desc">একজন মানুষের সম্পূর্ণ স্বাস্থ্য পরীক্ষা ও প্রয়োজনীয় ওষুধ সরবরাহ করা যায়।</div>
+          </div>
+          <div class="impact-item">
+            <div class="impact-amount">৳ ৫,০০০</div>
+            <div class="impact-desc">একটি গ্রামের শিশুদের জন্য সম্পূর্ণ এক বছরের স্কুল সামগ্রী সরবরাহ করা সম্ভব।</div>
+          </div>
+        </div>
+
+        <!-- Trust Badges -->
+        <div style="background:white;border-radius:var(--radius-md);padding:28px;margin-top:24px;border:1px solid #e8f0ea;box-shadow:var(--shadow-sm)">
+          <h4 style="color:var(--green-dark);margin-bottom:18px;font-size:17px">কেন আমাদের উপর বিশ্বাস রাখবেন?</h4>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <span style="font-size:22px">✅</span>
+              <div><strong style="color:var(--text-primary);font-size:14px">স্বচ্ছ হিসাব</strong><p style="font-size:13px;color:var(--text-secondary);margin:3px 0 0">প্রতিটি ডোনেশনের হিসাব আমরা প্রকাশ করি।</p></div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <span style="font-size:22px">🏛️</span>
+              <div><strong style="color:var(--text-primary);font-size:14px">সরকারি নিবন্ধিত</strong><p style="font-size:13px;color:var(--text-secondary);margin:3px 0 0">আমরা সরকারিভাবে নিবন্ধিত সংগঠন।</p></div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <span style="font-size:22px">📊</span>
+              <div><strong style="color:var(--text-primary);font-size:14px">বার্ষিক প্রতিবেদন</strong><p style="font-size:13px;color:var(--text-secondary);margin:3px 0 0">প্রতি বছর কার্যক্রমের বিস্তারিত প্রতিবেদন প্রকাশিত হয়।</p></div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <span style="font-size:22px">❤️</span>
+              <div><strong style="color:var(--text-primary);font-size:14px">১০,০০০+ উপকারভোগী</strong><p style="font-size:13px;color:var(--text-secondary);margin:3px 0 0">আমাদের কার্যক্রম থেকে লাভবান হয়েছেন।</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="footer-placeholder"></div>
+<script src="../js/config.js"></script>
+<script src="../js/components.js"></script>
+<script>
+initSharedComponents('');
+let selectedAmount = 1000;
+let selectedMethod = 'bkash';
+
+// Amount buttons
+document.querySelectorAll('.amount-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedAmount = parseInt(btn.dataset.amount);
+    document.getElementById('customAmount').value = '';
+  });
+});
+
+document.getElementById('customAmount').addEventListener('input', function() {
+  document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
+  selectedAmount = parseInt(this.value) || 0;
+});
+
+// Payment methods
+document.querySelectorAll('.payment-method').forEach(pm => {
+  pm.addEventListener('click', () => {
+    document.querySelectorAll('.payment-method').forEach(p => p.classList.remove('active'));
+    pm.classList.add('active');
+    selectedMethod = pm.dataset.method;
+  });
+});
+
+document.getElementById('donateForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const form = e.target;
+  const btn = document.getElementById('donateBtn');
+  const amount = parseInt(document.getElementById('customAmount').value) || selectedAmount;
+  if (!amount || amount < 10) { alert('অনুগ্রহ করে সঠিক পরিমাণ দিন (সর্বনিম্ন ৳১০)'); return; }
+  btn.disabled = true; btn.textContent = 'পাঠানো হচ্ছে...';
+  try {
+    const res = await API.post('/donate', {
+      donor_name: form.donor_name.value || 'Anonymous',
+      donor_phone: form.donor_phone.value,
+      amount, payment_method: selectedMethod,
+      transaction_id: form.transaction_id.value,
+      note: form.note.value,
+    });
+    if (res.success) { form.style.display = 'none'; document.getElementById('donateSuccess').style.display = 'block'; }
+    else { alert(res.message || 'কিছু সমস্যা হয়েছে। পরে চেষ্টা করুন।'); }
+  } catch(err) { alert('সার্ভার সমস্যা। পরে চেষ্টা করুন।'); }
+  btn.disabled = false; btn.textContent = '❤️ ডোনেশন নিশ্চিত করুন';
+});
+</script>
+</body>
+</html>

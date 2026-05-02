@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>টিম মেম্বার - অ্যাডমিন</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto Serif Bengali':wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css"><link rel="stylesheet" href="admin.css">
+<style>
+.team-admin-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+.team-admin-card { background: white; border: 1px solid #e8f0ea; border-radius: var(--radius-md); padding: 24px; text-align: center; box-shadow: var(--shadow-sm); transition: var(--transition); }
+.team-admin-card:hover { box-shadow: var(--shadow-md); }
+.ta-avatar { width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, var(--green-light), var(--green-bright)); display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 700; color: white; margin: 0 auto 12px; overflow: hidden; font-family: 'Noto Serif Bengali', serif; }
+.ta-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.ta-name { font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+.ta-desig { font-size: 12px; color: var(--green-light); font-weight: 600; margin-bottom: 14px; }
+.ta-actions { display: flex; gap: 8px; justify-content: center; }
+</style>
+</head>
+<body class="admin-body">
+<div id="sidebar-placeholder"></div>
+<main class="admin-main">
+  <div class="admin-header">
+    <div><h1 class="admin-title">টিম মেম্বার</h1><p class="admin-subtitle">সদস্য যোগ, সম্পাদনা ও অর্ডার পরিবর্তন করুন</p></div>
+    <div style="display:flex;gap:10px">
+      <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+      <button class="admin-btn" onclick="openModal('teamModal')">+ নতুন সদস্য</button>
+    </div>
+  </div>
+  <div class="admin-card">
+    <div class="team-admin-grid" id="teamGrid"><div class="loading-placeholder" style="grid-column:1/-1;padding:40px">লোড হচ্ছে...</div></div>
+  </div>
+</main>
+
+<!-- Modal -->
+<div class="modal-overlay" id="teamModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 id="teamModalTitle">নতুন সদস্য যোগ করুন</h3>
+      <button class="modal-close" onclick="closeModal('teamModal')">✕</button>
+    </div>
+    <form id="teamForm">
+      <input type="hidden" id="editTeamId">
+      <div class="form-row">
+        <div class="admin-form-group"><label>নাম *</label><input type="text" id="tmName" required></div>
+        <div class="admin-form-group"><label>পদবি *</label><input type="text" id="tmDesig" required></div>
+      </div>
+      <div class="admin-form-group"><label>বায়ো</label><textarea id="tmBio" style="min-height:80px"></textarea></div>
+      <div class="form-row">
+        <div class="admin-form-group"><label>ইমেইল</label><input type="email" id="tmEmail"></div>
+        <div class="admin-form-group"><label>ফোন</label><input type="tel" id="tmPhone"></div>
+      </div>
+      <div class="form-row">
+        <div class="admin-form-group"><label>Facebook URL</label><input type="url" id="tmFacebook"></div>
+        <div class="admin-form-group"><label>ক্রম নম্বর</label><input type="number" id="tmOrder" value="0" min="0"></div>
+      </div>
+      <div class="admin-form-group"><label>ছবি</label><input type="file" id="tmPhoto" accept="image/*"></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button type="button" class="admin-btn secondary" onclick="closeModal('teamModal')">বাতিল</button>
+        <button type="submit" class="admin-btn">সংরক্ষণ</button>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="toast"></div>
+<script src="../js/config.js"></script>
+<script src="admin.js"></script>
+<script src="sidebar.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => { initAdminPage('team'); loadTeam(); });
+
+async function loadTeam() {
+  const grid = document.getElementById('teamGrid');
+  try {
+    const data = await adminFetch('/admin/team');
+    if (!data.success) throw new Error();
+    if (!data.data.length) { grid.innerHTML = '<div class="loading-placeholder" style="grid-column:1/-1;padding:40px">কোনো সদস্য নেই। প্রথম সদস্য যোগ করুন।</div>'; return; }
+    const base = CONFIG.API_URL.replace('/api','');
+    grid.innerHTML = data.data.map(m => {
+      const initials = m.name.split(' ').slice(0,2).map(n=>n[0]).join('');
+      return `
+      <div class="team-admin-card">
+        <div class="ta-avatar">${m.photo ? `<img src="${base}/${m.photo}" alt="${m.name}">` : initials}</div>
+        <div class="ta-name">${m.name}</div>
+        <div class="ta-desig">${m.designation}</div>
+        <div class="ta-actions">
+          <button class="admin-btn" style="padding:6px 14px;font-size:12px" onclick='editMember(${JSON.stringify(m).replace(/'/g,"&#39;")})'>✏️ সম্পাদনা</button>
+          <button class="admin-btn danger" style="padding:6px 12px;font-size:12px" onclick="deleteMember(${m.id})">🗑️</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) { grid.innerHTML = '<div class="loading-placeholder" style="grid-column:1/-1;padding:40px">লোড ব্যর্থ</div>'; }
+}
+
+function editMember(m) {
+  document.getElementById('teamModalTitle').textContent = 'সদস্য সম্পাদনা';
+  document.getElementById('editTeamId').value = m.id;
+  document.getElementById('tmName').value = m.name;
+  document.getElementById('tmDesig').value = m.designation;
+  document.getElementById('tmBio').value = m.bio || '';
+  document.getElementById('tmEmail').value = m.email || '';
+  document.getElementById('tmPhone').value = m.phone || '';
+  document.getElementById('tmFacebook').value = m.facebook || '';
+  document.getElementById('tmOrder').value = m.sort_order || 0;
+  openModal('teamModal');
+}
+
+async function deleteMember(id) {
+  confirmDelete('এই সদস্যকে মুছে ফেলতে চান?', async () => {
+    const res = await adminFetch(`/admin/team?id=${id}`, { method: 'DELETE' });
+    if (res.success) { showToast('সদস্য মুছে ফেলা হয়েছে'); loadTeam(); }
+    else showToast('মুছতে ব্যর্থ', 'error');
+  });
+}
+
+document.getElementById('teamForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const id = document.getElementById('editTeamId').value;
+  const data = {
+    id, name: document.getElementById('tmName').value,
+    designation: document.getElementById('tmDesig').value,
+    bio: document.getElementById('tmBio').value,
+    email: document.getElementById('tmEmail').value,
+    phone: document.getElementById('tmPhone').value,
+    facebook: document.getElementById('tmFacebook').value,
+    sort_order: document.getElementById('tmOrder').value,
+  };
+  const res = await adminFetch('/admin/team', { method: id ? 'PUT' : 'POST', body: JSON.stringify(data) });
+  if (res.success) { showToast(id ? 'সদস্য আপডেট হয়েছে' : 'সদস্য যোগ হয়েছে'); closeModal('teamModal'); loadTeam(); document.getElementById('editTeamId').value = ''; }
+  else showToast('সংরক্ষণ ব্যর্থ', 'error');
+});
+</script>
+</body>
+</html>

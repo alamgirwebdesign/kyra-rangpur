@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>গ্যালারি - অ্যাডমিন</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css"><link rel="stylesheet" href="admin.css">
+<style>
+.gallery-admin-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+.gallery-admin-item { border-radius: var(--radius-sm); overflow: hidden; border: 1px solid #e8f0ea; background: var(--gray-light); position: relative; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
+.gallery-admin-item img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+.gallery-admin-item .ga-overlay { position: absolute; inset: 0; background: rgba(26,71,49,0.7); opacity: 0; transition: var(--transition); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
+.gallery-admin-item:hover .ga-overlay { opacity: 1; }
+.ga-emoji { font-size: 40px; }
+.ga-title { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(26,71,49,0.85); color: white; font-size: 12px; padding: 6px 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+</style>
+</head>
+<body class="admin-body">
+<div id="sidebar-placeholder"></div>
+<main class="admin-main">
+  <div class="admin-header">
+    <div><h1 class="admin-title">গ্যালারি</h1><p class="admin-subtitle">ছবি যোগ ও মুছুন</p></div>
+    <div style="display:flex;gap:10px">
+      <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+      <button class="admin-btn" onclick="openModal('galleryModal')">+ ছবি যোগ করুন</button>
+    </div>
+  </div>
+
+  <!-- Filter -->
+  <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+    <button class="admin-btn secondary" style="padding:8px 16px" data-gcat="" onclick="filterGallery(this,'')">সব</button>
+    <button class="admin-btn secondary" style="padding:8px 16px" data-gcat="event" onclick="filterGallery(this,'event')">📅 ইভেন্ট</button>
+    <button class="admin-btn secondary" style="padding:8px 16px" data-gcat="distribution" onclick="filterGallery(this,'distribution')">📦 বিতরণ</button>
+    <button class="admin-btn secondary" style="padding:8px 16px" data-gcat="volunteer" onclick="filterGallery(this,'volunteer')">🤝 স্বেচ্ছাসেবক</button>
+    <button class="admin-btn secondary" style="padding:8px 16px" data-gcat="general" onclick="filterGallery(this,'general')">📸 সাধারণ</button>
+  </div>
+
+  <div class="admin-card">
+    <div class="gallery-admin-grid" id="galleryGrid"><div class="loading-placeholder" style="grid-column:1/-1;padding:40px">লোড হচ্ছে...</div></div>
+  </div>
+</main>
+
+<!-- Upload Modal -->
+<div class="modal-overlay" id="galleryModal">
+  <div class="modal-box" style="max-width:460px">
+    <div class="modal-header">
+      <h3>ছবি আপলোড করুন</h3>
+      <button class="modal-close" onclick="closeModal('galleryModal')">✕</button>
+    </div>
+    <form id="galleryForm" enctype="multipart/form-data">
+      <div class="admin-form-group"><label>ছবি বেছে নিন *</label><input type="file" id="gFile" accept="image/*" required multiple></div>
+      <div class="admin-form-group"><label>শিরোনাম</label><input type="text" id="gTitle" placeholder="ছবির শিরোনাম (ঐচ্ছিক)"></div>
+      <div class="admin-form-group"><label>ক্যাটাগরি</label>
+        <select id="gCategory">
+          <option value="general">📸 সাধারণ</option>
+          <option value="event">📅 ইভেন্ট</option>
+          <option value="distribution">📦 বিতরণ</option>
+          <option value="volunteer">🤝 স্বেচ্ছাসেবক</option>
+        </select>
+      </div>
+      <div id="uploadProgress" style="display:none;margin-bottom:14px">
+        <div style="background:var(--gray-light);border-radius:50px;height:8px;overflow:hidden">
+          <div id="progressBar" style="height:100%;background:var(--green-light);width:0%;transition:width 0.3s"></div>
+        </div>
+        <div id="progressText" style="font-size:12px;color:var(--text-secondary);margin-top:6px;text-align:center"></div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button type="button" class="admin-btn secondary" onclick="closeModal('galleryModal')">বাতিল</button>
+        <button type="submit" class="admin-btn" id="uploadBtn">আপলোড করুন</button>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="toast"></div>
+<script src="../js/config.js"></script>
+<script src="admin.js"></script>
+<script src="sidebar.js"></script>
+<script>
+let allGallery = [];
+let currentCat = '';
+
+document.addEventListener('DOMContentLoaded', () => { initAdminPage('gallery'); loadGallery(); });
+
+async function loadGallery() {
+  const grid = document.getElementById('galleryGrid');
+  try {
+    const data = await adminFetch('/admin/gallery');
+    allGallery = data.success ? data.data : [];
+    renderGallery();
+  } catch(e) { grid.innerHTML = '<div class="loading-placeholder" style="grid-column:1/-1;padding:40px">লোড ব্যর্থ</div>'; }
+}
+
+function renderGallery() {
+  const grid = document.getElementById('galleryGrid');
+  const filtered = currentCat ? allGallery.filter(i => i.category === currentCat) : allGallery;
+  if (!filtered.length) { grid.innerHTML = '<div class="loading-placeholder" style="grid-column:1/-1;padding:40px">কোনো ছবি নেই।</div>'; return; }
+  const base = CONFIG.API_URL.replace('/api','');
+  grid.innerHTML = filtered.map(item => `
+    <div class="gallery-admin-item">
+      ${item.image_path ? `<img src="${base}/${item.image_path}" alt="${item.title||''}">` : `<div class="ga-emoji">📸</div>`}
+      <div class="ga-overlay">
+        <button class="admin-btn danger" style="padding:8px 16px;font-size:13px" onclick="deleteGallery(${item.id})">🗑️ মুছুন</button>
+      </div>
+      <div class="ga-title">${item.title || item.category || 'ছবি'}</div>
+    </div>`).join('');
+}
+
+function filterGallery(btn, cat) {
+  document.querySelectorAll('[data-gcat]').forEach(b => b.style.background = '#6c757d');
+  btn.style.background = 'var(--green-dark)';
+  currentCat = cat;
+  renderGallery();
+}
+
+async function deleteGallery(id) {
+  confirmDelete('এই ছবি মুছে ফেলতে চান?', async () => {
+    const res = await adminFetch(`/admin/gallery?id=${id}`, { method: 'DELETE' });
+    if (res.success) { showToast('ছবি মুছে ফেলা হয়েছে'); loadGallery(); }
+    else showToast('মুছতে ব্যর্থ', 'error');
+  });
+}
+
+document.getElementById('galleryForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const files = document.getElementById('gFile').files;
+  if (!files.length) return;
+  const btn = document.getElementById('uploadBtn');
+  const progress = document.getElementById('uploadProgress');
+  const bar = document.getElementById('progressBar');
+  const text = document.getElementById('progressText');
+  btn.disabled = true; progress.style.display = 'block';
+
+  let uploaded = 0;
+  for (const file of files) {
+    const fd = new FormData();
+    fd.append('image', file);
+    fd.append('title', document.getElementById('gTitle').value);
+    fd.append('category', document.getElementById('gCategory').value);
+    try {
+      const res = await fetch(`${CONFIG.API_URL}/admin/gallery`, { method: 'POST', headers: { 'Authorization': `Bearer ${API.getToken()}` }, body: fd });
+      uploaded++;
+      const pct = Math.round((uploaded / files.length) * 100);
+      bar.style.width = pct + '%';
+      text.textContent = `${uploaded}/${files.length} ছবি আপলোড হয়েছে`;
+    } catch(err) {}
+  }
+  showToast(`${uploaded}টি ছবি আপলোড হয়েছে`);
+  closeModal('galleryModal');
+  btn.disabled = false; progress.style.display = 'none';
+  loadGallery();
+  e.target.reset();
+});
+</script>
+</body>
+</html>

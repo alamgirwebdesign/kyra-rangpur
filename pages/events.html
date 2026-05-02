@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ইভেন্ট - কায়রা ফাউন্ডেশন</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Noto+Serif+Bengali:wght@400;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css"><link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<div id="navbar-placeholder"></div>
+
+<section class="page-hero">
+  <div class="container">
+    <div class="breadcrumb"><a href="../index.html">হোম</a> → ইভেন্ট</div>
+    <h1>ইভেন্ট ও অনুষ্ঠান</h1>
+    <p>কায়রা ফাউন্ডেশনের আসন্ন ও সম্পন্ন ইভেন্ট সমূহ</p>
+  </div>
+</section>
+
+<section style="padding:70px 0;background:var(--off-white)">
+  <div class="container">
+    <div class="events-tabs" id="eventTabs">
+      <button class="events-tab active" data-status="upcoming">আসন্ন ইভেন্ট</button>
+      <button class="events-tab" data-status="ongoing">চলমান</button>
+      <button class="events-tab" data-status="completed">সম্পন্ন</button>
+      <button class="events-tab" data-status="">সব</button>
+    </div>
+
+    <div class="events-grid" id="eventsGrid">
+      <div class="project-skeleton" style="height:340px"></div>
+      <div class="project-skeleton" style="height:340px"></div>
+      <div class="project-skeleton" style="height:340px"></div>
+    </div>
+    <div id="noEvents" style="display:none;text-align:center;padding:60px 20px;color:var(--text-secondary)">
+      <div style="font-size:48px;margin-bottom:16px">📅</div>
+      <p>এই ফিল্টারে কোনো ইভেন্ট নেই।</p>
+    </div>
+  </div>
+</section>
+
+<div id="footer-placeholder"></div>
+<script src="../js/config.js"></script>
+<script src="../js/components.js"></script>
+<script>
+initSharedComponents('events');
+const defaultEvents = [
+  { title:'বার্ষিক স্বেচ্ছাসেবক সম্মেলন ২০২৪', description:'কায়রা ফাউন্ডেশনের সকল স্বেচ্ছাসেবকদের বার্ষিক মিলনমেলা ও পুরস্কার বিতরণী অনুষ্ঠান।', event_date:'2024-12-15', event_time:'10:00', location:'রংপুর টাউন হল', status:'upcoming', emoji:'🏆' },
+  { title:'শীতকালীন স্বাস্থ্য শিবির', description:'গাইবান্ধার প্রত্যন্ত অঞ্চলে বিনামূল্যে চিকিৎসা সেবা ও ওষুধ বিতরণ শিবির।', event_date:'2024-12-20', event_time:'09:00', location:'গাইবান্ধা সদর', status:'upcoming', emoji:'🏥' },
+  { title:'শিক্ষা বৃত্তি বিতরণ অনুষ্ঠান', description:'মেধাবী ও সুবিধাবঞ্চিত শিক্ষার্থীদের মাঝে বার্ষিক বৃত্তি বিতরণ।', event_date:'2024-12-25', event_time:'11:00', location:'নীলফামারী', status:'upcoming', emoji:'🎓' },
+  { title:'শীতবস্ত্র বিতরণ ২০২৪', description:'দরিদ্র পরিবারের মাঝে কম্বল, শীতের পোশাক বিতরণ কার্যক্রম।', event_date:'2024-11-30', event_time:'09:30', location:'রংপুর, নীলফামারী', status:'completed', emoji:'🧣' },
+  { title:'বৃক্ষরোপণ অভিযান', description:'রংপুর শহরে ১,০০০ গাছ লাগানোর কার্যক্রম।', event_date:'2024-11-15', event_time:'08:00', location:'রংপুর শহর', status:'completed', emoji:'🌳' },
+  { title:'আন্তর্জাতিক স্বেচ্ছাসেবক দিবস', description:'আন্তর্জাতিক স্বেচ্ছাসেবক দিবস উপলক্ষে আলোচনা সভা ও পুরস্কার বিতরণ।', event_date:'2024-12-05', event_time:'14:00', location:'রংপুর', status:'completed', emoji:'🤝' },
+];
+
+let allEvents = [];
+let activeStatus = 'upcoming';
+
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const res = await API.get('/events');
+    allEvents = (res.success && res.data.length) ? res.data : defaultEvents;
+  } catch(e) { allEvents = defaultEvents; }
+  renderEvents();
+});
+
+function renderEvents() {
+  const grid = document.getElementById('eventsGrid');
+  const noEl = document.getElementById('noEvents');
+  const filtered = activeStatus ? allEvents.filter(e => e.status === activeStatus) : allEvents;
+
+  if (!filtered.length) { grid.innerHTML = ''; noEl.style.display = 'block'; return; }
+  noEl.style.display = 'none';
+
+  grid.innerHTML = filtered.map(e => {
+    const d = new Date(e.event_date);
+    const dateStr = `${d.getDate()} ${MONTHS_BN[d.getMonth()]} ${d.getFullYear()}`;
+    const base = CONFIG.API_URL.replace('/api','');
+    return `
+    <div class="event-detail-card fade-in">
+      <div class="event-cover">
+        ${e.cover_image ? `<img src="${base}/${e.cover_image}" alt="${e.title}">` : `<div style="font-size:64px">${e.emoji || '📅'}</div>`}
+        <span class="event-date-tag">${dateStr}</span>
+      </div>
+      <div class="event-body">
+        <div style="margin-bottom:10px"><span class="badge ${e.status}">${STATUS_LABELS[e.status]?.label || ''}</span></div>
+        <h3>${e.title}</h3>
+        <p style="font-size:14px;color:var(--text-secondary);margin-bottom:14px;line-height:1.6">${e.description || ''}</p>
+        <div class="event-meta">
+          <div class="event-meta-item">📅 ${dateStr}${e.event_time ? ' • ' + e.event_time : ''}</div>
+          <div class="event-meta-item">📍 ${e.location || 'রংপুর'}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  document.querySelectorAll('.fade-in').forEach(el => setTimeout(() => el.classList.add('visible'), 50));
+}
+
+document.querySelectorAll('.events-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.events-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    activeStatus = tab.dataset.status;
+    renderEvents();
+  });
+});
+</script>
+</body>
+</html>

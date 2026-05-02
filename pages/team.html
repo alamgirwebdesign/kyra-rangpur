@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>আমাদের টিম - কায়রা ফাউন্ডেশন</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Noto+Serif+Bengali:wght@400;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css"><link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<div id="navbar-placeholder"></div>
+
+<section class="page-hero">
+  <div class="container">
+    <div class="breadcrumb"><a href="../index.html">হোম</a> → আমাদের টিম</div>
+    <h1>আমাদের টিম</h1>
+    <p>কায়রা ফাউন্ডেশনের নিবেদিতপ্রাণ পরিচালক ও সদস্যবৃন্দ</p>
+  </div>
+</section>
+
+<section style="padding:70px 0;background:var(--off-white)">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag">নেতৃত্ব</div>
+      <h2>প্রতিষ্ঠাতা ও পরিচালনা পর্ষদ</h2>
+      <p>যাঁরা কায়রা ফাউন্ডেশনকে এগিয়ে নিয়ে যাচ্ছেন</p>
+    </div>
+    <div class="team-grid" id="leadershipGrid">
+      <div class="project-skeleton" style="height:360px"></div>
+      <div class="project-skeleton" style="height:360px"></div>
+      <div class="project-skeleton" style="height:360px"></div>
+    </div>
+  </div>
+</section>
+
+<section style="padding:70px 0;background:white">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag">আমাদের লক্ষ্য</div>
+      <h2>কেন আমরা এই কাজ করি?</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:24px">
+      <div style="background:var(--off-white);border-radius:var(--radius-md);padding:28px;border:1px solid #e8f0ea" class="fade-in">
+        <div style="font-size:36px;margin-bottom:12px">❤️</div>
+        <h3 style="font-size:18px;color:var(--green-dark);margin-bottom:8px">মানবতার ভালোবাসা</h3>
+        <p style="font-size:14px;color:var(--text-secondary)">মানুষের ভালোবাসা ও সেবা করার তীব্র ইচ্ছা থেকেই আমাদের এই যাত্রা শুরু।</p>
+      </div>
+      <div style="background:var(--off-white);border-radius:var(--radius-md);padding:28px;border:1px solid #e8f0ea" class="fade-in">
+        <div style="font-size:36px;margin-bottom:12px">🌟</div>
+        <h3 style="font-size:18px;color:var(--green-dark);margin-bottom:8px">পরিবর্তনের বিশ্বাস</h3>
+        <p style="font-size:14px;color:var(--text-secondary)">আমরা বিশ্বাস করি সম্মিলিত প্রচেষ্টায় রংপুরের মানুষের জীবন বদলে দেওয়া সম্ভব।</p>
+      </div>
+      <div style="background:var(--off-white);border-radius:var(--radius-md);padding:28px;border:1px solid #e8f0ea" class="fade-in">
+        <div style="font-size:36px;margin-bottom:12px">🏆</div>
+        <h3 style="font-size:18px;color:var(--green-dark);margin-bottom:8px">দায়িত্ববোধ</h3>
+        <p style="font-size:14px;color:var(--text-secondary)">সমাজের প্রতি দায়িত্ববোধ থেকে আমরা নিরলসভাবে কাজ করে যাচ্ছি।</p>
+      </div>
+      <div style="background:var(--off-white);border-radius:var(--radius-md);padding:28px;border:1px solid #e8f0ea" class="fade-in">
+        <div style="font-size:36px;margin-bottom:12px">🤝</div>
+        <h3 style="font-size:18px;color:var(--green-dark);margin-bottom:8px">একতার শক্তি</h3>
+        <p style="font-size:14px;color:var(--text-secondary)">একসাথে কাজ করলে আমরা যেকোনো বাধা অতিক্রম করতে পারি এই বিশ্বাসে আমরা বিশ্বাসী।</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Join CTA -->
+<section style="background:var(--green-dark);padding:70px 0;text-align:center">
+  <div class="container">
+    <h2 style="color:white;font-size:36px;margin-bottom:14px">আপনিও আমাদের টিমে যোগ দিন</h2>
+    <p style="color:rgba(255,255,255,0.8);font-size:17px;margin-bottom:32px;max-width:500px;margin-left:auto;margin-right:auto">আপনার দক্ষতা ও সময় দিয়ে রংপুরের মানুষের জীবন বদলে দেওয়ার সুযোগ নিন।</p>
+    <a href="volunteer.html" class="btn-white">🤝 স্বেচ্ছাসেবক হিসেবে যোগ দিন</a>
+  </div>
+</section>
+
+<div id="footer-placeholder"></div>
+<script src="../js/config.js"></script>
+<script src="../js/components.js"></script>
+<script>
+initSharedComponents('team');
+const defaultTeam = [
+  { name:'মো. রাশেদুল ইসলাম', designation:'প্রতিষ্ঠাতা ও সভাপতি', bio:'কায়রা ফাউন্ডেশনের স্বপ্নদ্রষ্টা। রংপুরের মানুষের জীবনমান উন্নয়নে প্রতিশ্রুতিবদ্ধ। সমাজকর্মে দীর্ঘ অভিজ্ঞতা সম্পন্ন।', email:'rashid@kayra.org', facebook:'#' },
+  { name:'ফারজানা আক্তার', designation:'সাধারণ সম্পাদক', bio:'শিক্ষা ও স্বাস্থ্য খাতে দীর্ঘ অভিজ্ঞতাসম্পন্ন সংগঠক। তৃণমূল পর্যায়ে কাজের বিশাল অভিজ্ঞতা রয়েছে।', email:'farjana@kayra.org', facebook:'#' },
+  { name:'মো. আবুল কালাম', designation:'কোষাধ্যক্ষ', bio:'অর্থ ব্যবস্থাপনায় দক্ষ ও সংগঠনের আর্থিক স্বচ্ছতা নিশ্চিতকারী। ব্যবসায় প্রশাসনে স্নাতকোত্তর।', email:'kalam@kayra.org', facebook:'#' },
+  { name:'নাজমা বেগম', designation:'প্রকল্প সমন্বয়কারী', bio:'শিক্ষা প্রকল্পের সফল বাস্তবায়নে নেতৃত্বদানকারী। শিশু শিক্ষায় বিশেষ আগ্রহী।', email:'najma@kayra.org', facebook:'#' },
+  { name:'মো. সাইফুল ইসলাম', designation:'স্বাস্থ্য প্রকল্প প্রধান', bio:'চিকিৎসক হিসেবে প্রশিক্ষিত। স্বাস্থ্য শিবির পরিচালনায় মুখ্য ভূমিকা পালন করেন।', email:'saiful@kayra.org', facebook:'#' },
+  { name:'রাহেলা খানম', designation:'সামাজিক মিডিয়া ও যোগাযোগ', bio:'ডিজিটাল মার্কেটিং ও কমিউনিকেশন বিশেষজ্ঞ। সংগঠনের অনলাইন উপস্থিতি পরিচালনা করেন।', email:'rahela@kayra.org', facebook:'#' },
+];
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const grid = document.getElementById('leadershipGrid');
+  let team = defaultTeam;
+  try {
+    const res = await API.get('/team');
+    if (res.success && res.data.length) team = res.data;
+  } catch(e) {}
+  grid.innerHTML = team.map(m => {
+    const initials = m.name ? m.name.split(' ').slice(0,2).map(n => n[0]).join('') : 'ক';
+    return `
+    <div class="team-card fade-in">
+      <div class="team-photo">
+        ${m.photo ? `<img src="${CONFIG.API_URL.replace('/api','')}/${m.photo}" alt="${m.name}">` : initials}
+      </div>
+      <h3>${m.name}</h3>
+      <div class="team-designation">${m.designation}</div>
+      <p class="team-bio">${m.bio || ''}</p>
+      <div class="team-social">
+        ${m.email ? `<a href="mailto:${m.email}">✉️ ইমেইল</a>` : ''}
+        ${m.facebook ? `<a href="${m.facebook}" target="_blank">📘 Facebook</a>` : ''}
+        ${m.phone ? `<a href="tel:${m.phone}">📞 কল</a>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+  document.querySelectorAll('.fade-in').forEach(el => setTimeout(() => el.classList.add('visible'), 100));
+});
+</script>
+</body>
+</html>

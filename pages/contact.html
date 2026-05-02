@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>যোগাযোগ - কায়রা ফাউন্ডেশন</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Noto+Serif+Bengali:wght@400;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css"><link rel="stylesheet" href="../css/pages.css">
+<style>
+.form-group { margin-bottom: 18px; }
+.form-group label { display: block; font-weight: 600; font-size: 14px; color: var(--text-primary); margin-bottom: 7px; }
+.form-group label span { color: var(--red-accent); }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 16px; border: 2px solid #e0ece3; border-radius: var(--radius-sm); font-family: 'Hind Siliguri', sans-serif; font-size: 15px; color: var(--text-primary); transition: var(--transition); outline: none; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--green-light); box-shadow: 0 0 0 4px rgba(64,145,108,0.1); }
+.form-group textarea { min-height: 120px; resize: vertical; }
+.form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.submit-btn { width: 100%; padding: 14px; background: var(--green-dark); color: white; border: none; border-radius: 50px; font-size: 16px; font-weight: 700; font-family: 'Hind Siliguri', sans-serif; cursor: pointer; transition: var(--transition); }
+.submit-btn:hover { background: var(--green-mid); transform: translateY(-1px); }
+.submit-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+.alert { padding: 12px 16px; border-radius: var(--radius-sm); margin-bottom: 16px; font-size: 14px; display: none; }
+.alert-success { background: var(--green-bg); border: 1px solid var(--green-pale); color: var(--green-dark); }
+.alert-error { background: #fff0f0; border: 1px solid #ffc9c9; color: #c62828; }
+@media(max-width:640px) { .form-row-2 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div id="navbar-placeholder"></div>
+
+<section class="page-hero">
+  <div class="container">
+    <div class="breadcrumb"><a href="../index.html">হোম</a> → যোগাযোগ</div>
+    <h1>যোগাযোগ করুন</h1>
+    <p>আমাদের সাথে যোগাযোগ করতে নিচের ফর্ম পূরণ করুন অথবা সরাসরি কল করুন</p>
+  </div>
+</section>
+
+<section style="padding:80px 0;background:var(--off-white)">
+  <div class="container">
+    <div class="contact-grid">
+      <!-- Contact Info -->
+      <div>
+        <h2>আমাদের সাথে কথা বলুন</h2>
+        <p style="color:var(--text-secondary);margin-bottom:28px">যেকোনো প্রশ্ন, পরামর্শ বা সহযোগিতার জন্য আমাদের সাথে যোগাযোগ করুন। আমরা সর্বদা আপনার পাশে আছি।</p>
+        <div class="contact-info-items">
+          <div class="contact-info-item">
+            <div class="ci-icon">📍</div>
+            <div class="ci-text">
+              <h4>ঠিকানা</h4>
+              <p id="ciAddress">রংপুর, বাংলাদেশ</p>
+            </div>
+          </div>
+          <div class="contact-info-item">
+            <div class="ci-icon">📞</div>
+            <div class="ci-text">
+              <h4>ফোন নম্বর</h4>
+              <p id="ciPhone">+880 1700-000000</p>
+            </div>
+          </div>
+          <div class="contact-info-item">
+            <div class="ci-icon">✉️</div>
+            <div class="ci-text">
+              <h4>ইমেইল</h4>
+              <p id="ciEmail">info@kayrafoundation.org</p>
+            </div>
+          </div>
+          <div class="contact-info-item">
+            <div class="ci-icon">🕐</div>
+            <div class="ci-text">
+              <h4>অফিস সময়</h4>
+              <p>শনি - বৃহস্পতি: সকাল ৯টা - বিকেল ৫টা</p>
+            </div>
+          </div>
+        </div>
+        <!-- Social -->
+        <h4 style="margin-bottom:12px;color:var(--green-dark)">সোশ্যাল মিডিয়া</h4>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <a href="#" style="display:flex;align-items:center;gap:8px;padding:10px 16px;background:white;border:1px solid #e8f0ea;border-radius:50px;font-size:14px;text-decoration:none;color:var(--text-primary);transition:var(--transition)" onmouseover="this.style.background='#1877f2';this.style.color='white'" onmouseout="this.style.background='white';this.style.color='var(--text-primary)'">📘 Facebook</a>
+          <a href="#" style="display:flex;align-items:center;gap:8px;padding:10px 16px;background:white;border:1px solid #e8f0ea;border-radius:50px;font-size:14px;text-decoration:none;color:var(--text-primary);transition:var(--transition)" onmouseover="this.style.background='#e1306c';this.style.color='white'" onmouseout="this.style.background='white';this.style.color='var(--text-primary)'">📷 Instagram</a>
+          <a href="#" style="display:flex;align-items:center;gap:8px;padding:10px 16px;background:white;border:1px solid #e8f0ea;border-radius:50px;font-size:14px;text-decoration:none;color:var(--text-primary);transition:var(--transition)" onmouseover="this.style.background='#ff0000';this.style.color='white'" onmouseout="this.style.background='white';this.style.color='var(--text-primary)'">▶️ YouTube</a>
+        </div>
+      </div>
+
+      <!-- Contact Form -->
+      <div class="contact-form-card">
+        <h3>বার্তা পাঠান</h3>
+        <div class="alert alert-success" id="successAlert">✅ আপনার বার্তা পাঠানো হয়েছে! ধন্যবাদ।</div>
+        <div class="alert alert-error" id="errorAlert"></div>
+        <form id="contactForm">
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>আপনার নাম <span>*</span></label>
+              <input type="text" name="name" placeholder="পূর্ণ নাম" required>
+            </div>
+            <div class="form-group">
+              <label>ফোন নম্বর</label>
+              <input type="tel" name="phone" placeholder="01XXXXXXXXX">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>ইমেইল</label>
+            <input type="email" name="email" placeholder="your@email.com">
+          </div>
+          <div class="form-group">
+            <label>বিষয়</label>
+            <select name="subject">
+              <option value="">বিষয় নির্বাচন করুন</option>
+              <option value="স্বেচ্ছাসেবক সম্পর্কিত">স্বেচ্ছাসেবক সম্পর্কিত</option>
+              <option value="ডোনেশন সম্পর্কিত">ডোনেশন সম্পর্কিত</option>
+              <option value="প্রকল্প সম্পর্কিত">প্রকল্প সম্পর্কিত</option>
+              <option value="সহযোগিতার প্রস্তাব">সহযোগিতার প্রস্তাব</option>
+              <option value="অন্যান্য">অন্যান্য</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>আপনার বার্তা <span>*</span></label>
+            <textarea name="message" placeholder="আপনার বার্তা লিখুন..." required></textarea>
+          </div>
+          <button type="submit" class="submit-btn" id="contactSubmitBtn">📨 বার্তা পাঠান</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Map placeholder -->
+<div style="background:#e8f0ea;height:280px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px">
+  <div style="font-size:48px">🗺️</div>
+  <p style="color:var(--green-mid);font-size:16px;font-weight:600">রংপুর, বাংলাদেশ</p>
+  <p style="color:var(--text-secondary);font-size:14px">Google Maps এ iframe এখানে যোগ করুন</p>
+</div>
+
+<div id="footer-placeholder"></div>
+<script src="../js/config.js"></script>
+<script src="../js/components.js"></script>
+<script>
+initSharedComponents('contact');
+
+// Load settings
+API.get('/settings').then(res => {
+  if (res.success) {
+    const d = res.data;
+    if (d.site_phone) document.getElementById('ciPhone').textContent = d.site_phone;
+    if (d.site_email) document.getElementById('ciEmail').textContent = d.site_email;
+    if (d.site_address) document.getElementById('ciAddress').textContent = d.site_address;
+  }
+}).catch(() => {});
+
+document.getElementById('contactForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const form = e.target;
+  const btn = document.getElementById('contactSubmitBtn');
+  const successAlert = document.getElementById('successAlert');
+  const errorAlert = document.getElementById('errorAlert');
+  successAlert.style.display = 'none'; errorAlert.style.display = 'none';
+  btn.disabled = true; btn.textContent = 'পাঠানো হচ্ছে...';
+  try {
+    const res = await API.post('/contact', {
+      name: form.name.value, phone: form.phone.value,
+      email: form.email.value, subject: form.subject.value, message: form.message.value
+    });
+    if (res.success) { form.reset(); successAlert.style.display = 'block'; }
+    else { errorAlert.textContent = res.message || 'কিছু সমস্যা হয়েছে।'; errorAlert.style.display = 'block'; }
+  } catch(err) { errorAlert.textContent = 'সার্ভার সমস্যা। পরে চেষ্টা করুন।'; errorAlert.style.display = 'block'; }
+  btn.disabled = false; btn.textContent = '📨 বার্তা পাঠান';
+});
+</script>
+</body>
+</html>

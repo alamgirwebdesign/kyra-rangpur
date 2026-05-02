@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>স্বেচ্ছাসেবক নিবন্ধন - কায়রা ফাউন্ডেশন</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Noto+Serif+Bengali:wght@400;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+.page-hero { background: linear-gradient(135deg, var(--green-dark), var(--green-mid)); padding: 120px 0 60px; text-align: center; }
+.page-hero h1 { color: white; font-size: 42px; margin-bottom: 12px; }
+.page-hero p { color: rgba(255,255,255,0.85); font-size: 18px; }
+.form-section { padding: 80px 0; background: var(--off-white); }
+.form-container { max-width: 680px; margin: 0 auto; background: white; border-radius: var(--radius-lg); padding: 48px; box-shadow: var(--shadow-md); }
+.form-container h2 { font-size: 28px; color: var(--green-dark); margin-bottom: 8px; }
+.form-container > p { color: var(--text-secondary); margin-bottom: 32px; }
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; font-size: 15px; }
+.form-group label span { color: var(--red-accent); }
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%; padding: 12px 16px; border: 2px solid #e0ece3; border-radius: var(--radius-sm);
+  font-family: 'Hind Siliguri', sans-serif; font-size: 15px; color: var(--text-primary);
+  transition: var(--transition); outline: none; background: white;
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--green-light); box-shadow: 0 0 0 4px rgba(64,145,108,0.1); }
+.form-group textarea { min-height: 110px; resize: vertical; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.checkbox-item { display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; }
+.checkbox-item input { width: auto; }
+.submit-btn {
+  width: 100%; padding: 16px; background: var(--green-dark); color: white;
+  border: none; border-radius: 50px; font-size: 17px; font-weight: 700;
+  font-family: 'Hind Siliguri', sans-serif; cursor: pointer; transition: var(--transition);
+}
+.submit-btn:hover { background: var(--green-mid); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.submit-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+.success-msg { display: none; text-align: center; padding: 40px 20px; }
+.success-msg .check { font-size: 60px; margin-bottom: 16px; }
+.success-msg h3 { font-size: 24px; color: var(--green-dark); margin-bottom: 8px; }
+.success-msg p { color: var(--text-secondary); }
+.alert { padding: 14px 18px; border-radius: var(--radius-sm); margin-bottom: 20px; font-size: 14px; display: none; }
+.alert-error { background: #fff0f0; border: 1px solid #ffcccc; color: #c62828; }
+.alert-success { background: var(--green-bg); border: 1px solid var(--green-pale); color: var(--green-dark); }
+</style>
+</head>
+<body>
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="../index.html" class="nav-logo" style="color:var(--green-dark)">
+      <div class="logo-icon">ক</div>
+      <div class="logo-text">
+        <span class="logo-main">কায়রা ফাউন্ডেশন</span>
+        <span class="logo-sub">রংপুর বিভাগ</span>
+      </div>
+    </a>
+    <div class="nav-menu" id="navMenu">
+      <a href="../index.html" class="nav-link">হোম</a>
+      <a href="about.html" class="nav-link">আমাদের সম্পর্কে</a>
+      <a href="projects.html" class="nav-link">প্রকল্প</a>
+      <a href="team.html" class="nav-link">টিম</a>
+      <a href="gallery.html" class="nav-link">গ্যালারি</a>
+      <a href="events.html" class="nav-link">ইভেন্ট</a>
+      <a href="contact.html" class="nav-link">যোগাযোগ</a>
+      <a href="volunteer.html" class="nav-btn-join active">স্বেচ্ছাসেবক হন</a>
+      <a href="donate.html" class="nav-btn-donate">ডোনেট করুন</a>
+    </div>
+    <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <div class="container">
+    <h1>🤝 স্বেচ্ছাসেবক হিসেবে যোগ দিন</h1>
+    <p>আপনার মূল্যবান সময় ও দক্ষতা দিয়ে রংপুরের মানুষের জীবন বদলে দিন</p>
+  </div>
+</div>
+
+<section class="form-section">
+  <div class="container">
+    <div class="form-container">
+      <h2>নিবন্ধন ফর্ম</h2>
+      <p>নিচের তথ্যগুলো পূরণ করুন। আমাদের টিম শীঘ্রই আপনার সাথে যোগাযোগ করবে।</p>
+
+      <div class="alert alert-error" id="errorAlert"></div>
+
+      <form id="volunteerForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label>পূর্ণ নাম <span>*</span></label>
+            <input type="text" name="name" placeholder="আপনার পূর্ণ নাম লিখুন" required>
+          </div>
+          <div class="form-group">
+            <label>মোবাইল নম্বর <span>*</span></label>
+            <input type="tel" name="phone" placeholder="01XXXXXXXXX" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>ইমেইল</label>
+            <input type="email" name="email" placeholder="your@email.com">
+          </div>
+          <div class="form-group">
+            <label>জেলা <span>*</span></label>
+            <select name="district" required>
+              <option value="">জেলা নির্বাচন করুন</option>
+              <option value="রংপুর">রংপুর</option>
+              <option value="গাইবান্ধা">গাইবান্ধা</option>
+              <option value="কুড়িগ্রাম">কুড়িগ্রাম</option>
+              <option value="লালমনিরহাট">লালমনিরহাট</option>
+              <option value="নীলফামারী">নীলফামারী</option>
+              <option value="পঞ্চগড়">পঞ্চগড়</option>
+              <option value="ঠাকুরগাঁও">ঠাকুরগাঁও</option>
+              <option value="দিনাজপুর">দিনাজপুর</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>দক্ষতা / আগ্রহের ক্ষেত্র</label>
+          <div class="checkbox-group">
+            <label class="checkbox-item"><input type="checkbox" name="skills" value="শিক্ষা"> শিক্ষা কার্যক্রম</label>
+            <label class="checkbox-item"><input type="checkbox" name="skills" value="স্বাস্থ্য"> স্বাস্থ্য সেবা</label>
+            <label class="checkbox-item"><input type="checkbox" name="skills" value="ত্রাণ বিতরণ"> ত্রাণ বিতরণ</label>
+            <label class="checkbox-item"><input type="checkbox" name="skills" value="ডিজিটাল মার্কেটিং"> ডিজিটাল মার্কেটিং</label>
+            <label class="checkbox-item"><input type="checkbox" name="skills" value="ফটোগ্রাফি"> ফটোগ্রাফি</label>
+            <label class="checkbox-item"><input type="checkbox" name="skills" value="অন্যান্য"> অন্যান্য</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>সাপ্তাহিক সময় প্রদান</label>
+          <select name="availability">
+            <option value="">কতটুকু সময় দিতে পারবেন?</option>
+            <option value="সপ্তাহে ১-২ ঘণ্টা">সপ্তাহে ১-২ ঘণ্টা</option>
+            <option value="সপ্তাহে ৩-৫ ঘণ্টা">সপ্তাহে ৩-৫ ঘণ্টা</option>
+            <option value="সপ্তাহে ৫+ ঘণ্টা">সপ্তাহে ৫+ ঘণ্টা</option>
+            <option value="পূর্ণকালীন">পূর্ণকালীন</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>আপনি কেন যোগ দিতে চান?</label>
+          <textarea name="message" placeholder="আপনার অনুপ্রেরণা বা বার্তা লিখুন..."></textarea>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn">নিবন্ধন সম্পন্ন করুন →</button>
+      </form>
+
+      <div class="success-msg" id="successMsg">
+        <div class="check">✅</div>
+        <h3>নিবন্ধন সফল হয়েছে!</h3>
+        <p>আপনার আবেদন গ্রহণ করা হয়েছে। আমাদের টিম শীঘ্রই আপনার সাথে যোগাযোগ করবে। ধন্যবাদ!</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="../js/config.js"></script>
+<script>
+document.getElementById('hamburger')?.addEventListener('click', () => {
+  document.getElementById('navMenu')?.classList.toggle('open');
+});
+
+document.getElementById('volunteerForm')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const btn = document.getElementById('submitBtn');
+  const errorAlert = document.getElementById('errorAlert');
+  errorAlert.style.display = 'none';
+
+  const skills = [...form.querySelectorAll('input[name="skills"]:checked')].map(el => el.value).join(', ');
+  const data = {
+    name: form.name.value,
+    phone: form.phone.value,
+    email: form.email.value,
+    district: form.district.value,
+    skills: skills,
+    availability: form.availability.value,
+    message: form.message.value,
+  };
+
+  if (!data.district) { errorAlert.textContent = 'অনুগ্রহ করে জেলা নির্বাচন করুন।'; errorAlert.style.display = 'block'; return; }
+
+  btn.disabled = true;
+  btn.textContent = 'পাঠানো হচ্ছে...';
+
+  try {
+    const res = await API.post('/volunteer', data);
+    if (res.success) {
+      form.style.display = 'none';
+      document.getElementById('successMsg').style.display = 'block';
+    } else {
+      errorAlert.textContent = res.message || 'কিছু সমস্যা হয়েছে। আবার চেষ্টা করুন।';
+      errorAlert.style.display = 'block';
+      btn.disabled = false; btn.textContent = 'নিবন্ধন সম্পন্ন করুন →';
+    }
+  } catch(err) {
+    errorAlert.textContent = 'সার্ভার সংযোগে সমস্যা। আবার চেষ্টা করুন।';
+    errorAlert.style.display = 'block';
+    btn.disabled = false; btn.textContent = 'নিবন্ধন সম্পন্ন করুন →';
+  }
+});
+</script>
+</body>
+</html>

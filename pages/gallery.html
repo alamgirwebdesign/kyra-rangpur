@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>গ্যালারি - কায়রা ফাউন্ডেশন</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Noto+Serif+Bengali:wght@400;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css"><link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<div id="navbar-placeholder"></div>
+
+<section class="page-hero">
+  <div class="container">
+    <div class="breadcrumb"><a href="../index.html">হোম</a> → গ্যালারি</div>
+    <h1>ফটো গ্যালারি</h1>
+    <p>আমাদের কার্যক্রমের বিভিন্ন মুহূর্তের ছবি</p>
+  </div>
+</section>
+
+<section style="padding:70px 0;background:var(--off-white)">
+  <div class="container">
+    <!-- Filter -->
+    <div class="gallery-filter">
+      <button class="filter-btn active" data-cat="">সব ছবি</button>
+      <button class="filter-btn" data-cat="event">📅 ইভেন্ট</button>
+      <button class="filter-btn" data-cat="distribution">📦 বিতরণ কার্যক্রম</button>
+      <button class="filter-btn" data-cat="volunteer">🤝 স্বেচ্ছাসেবক</button>
+      <button class="filter-btn" data-cat="general">📸 সাধারণ</button>
+    </div>
+
+    <div class="gallery-main-grid" id="galleryMainGrid">
+      <!-- Loaded dynamically -->
+    </div>
+
+    <div id="galleryLoading" style="text-align:center;padding:60px;color:var(--text-secondary)">লোড হচ্ছে...</div>
+    <div id="noGallery" style="display:none;text-align:center;padding:60px 20px;color:var(--text-secondary)">
+      <div style="font-size:48px;margin-bottom:16px">🖼️</div>
+      <p>এই ক্যাটাগরিতে কোনো ছবি নেই।</p>
+    </div>
+  </div>
+</section>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <button class="lightbox-prev" onclick="prevImage()">‹</button>
+  <img src="" alt="" id="lightboxImg">
+  <button class="lightbox-next" onclick="nextImage()">›</button>
+</div>
+
+<div id="footer-placeholder"></div>
+<script src="../js/config.js"></script>
+<script src="../js/components.js"></script>
+<script>
+initSharedComponents('gallery');
+
+const placeholderItems = [
+  { image_path:'', title:'শিক্ষা কার্যক্রম', emoji:'📚', category:'event' },
+  { image_path:'', title:'স্বাস্থ্য শিবির', emoji:'🏥', category:'distribution' },
+  { image_path:'', title:'শীতবস্ত্র বিতরণ', emoji:'🧣', category:'distribution' },
+  { image_path:'', title:'স্বেচ্ছাসেবক দল', emoji:'🤝', category:'volunteer' },
+  { image_path:'', title:'পুরস্কার অনুষ্ঠান', emoji:'🏆', category:'event' },
+  { image_path:'', title:'বৃক্ষরোপণ', emoji:'🌿', category:'volunteer' },
+  { image_path:'', title:'ত্রাণ বিতরণ', emoji:'📦', category:'distribution' },
+  { image_path:'', title:'প্রশিক্ষণ কর্মশালা', emoji:'📖', category:'event' },
+  { image_path:'', title:'মাঠ পরিদর্শন', emoji:'🗺️', category:'general' },
+  { image_path:'', title:'সভা', emoji:'💬', category:'general' },
+  { image_path:'', title:'শিশু শিক্ষা', emoji:'🎒', category:'event' },
+  { image_path:'', title:'নারী উন্নয়ন', emoji:'👩', category:'volunteer' },
+];
+
+let allImages = [];
+let currentIndex = 0;
+let filteredImages = [];
+let activeCategory = '';
+
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const res = await API.get('/gallery');
+    allImages = (res.success && res.data.length) ? res.data : placeholderItems;
+  } catch(e) { allImages = placeholderItems; }
+  renderGallery();
+});
+
+function renderGallery() {
+  const grid = document.getElementById('galleryMainGrid');
+  const loading = document.getElementById('galleryLoading');
+  const noGallery = document.getElementById('noGallery');
+  loading.style.display = 'none';
+
+  filteredImages = activeCategory ? allImages.filter(i => i.category === activeCategory) : allImages;
+
+  if (!filteredImages.length) { grid.innerHTML = ''; noGallery.style.display = 'block'; return; }
+  noGallery.style.display = 'none';
+
+  grid.innerHTML = filteredImages.map((item, index) => {
+    const heights = ['200px','260px','220px','300px','240px','280px'];
+    const h = heights[index % heights.length];
+    const base = CONFIG.API_URL.replace('/api','');
+    return `
+    <div class="gallery-photo" style="height:${h}" onclick="openLightbox(${index})">
+      ${item.image_path ? `<img src="${base}/${item.image_path}" alt="${item.title || ''}">` : `<div style="font-size:60px">${item.emoji || '📸'}</div>`}
+      <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(26,71,49,0.7) 0%,transparent 50%);opacity:0;transition:var(--transition);display:flex;align-items:flex-end;padding:14px" class="gallery-overlay">
+        <span style="color:white;font-size:13px;font-weight:600">${item.title || ''}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.querySelectorAll('.gallery-photo').forEach(el => {
+    el.addEventListener('mouseenter', () => el.querySelector('.gallery-overlay').style.opacity = '1');
+    el.addEventListener('mouseleave', () => el.querySelector('.gallery-overlay').style.opacity = '0');
+  });
+}
+
+function openLightbox(index) {
+  currentIndex = index;
+  const item = filteredImages[index];
+  const lb = document.getElementById('lightbox');
+  const img = document.getElementById('lightboxImg');
+  if (item.image_path) {
+    img.src = `${CONFIG.API_URL.replace('/api','')}/${item.image_path}`;
+    img.style.display = 'block';
+  } else {
+    img.style.display = 'none';
+  }
+  lb.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function prevImage() { currentIndex = (currentIndex - 1 + filteredImages.length) % filteredImages.length; openLightbox(currentIndex); }
+function nextImage() { currentIndex = (currentIndex + 1) % filteredImages.length; openLightbox(currentIndex); }
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeLightbox();
+  if (e.key === 'ArrowLeft') prevImage();
+  if (e.key === 'ArrowRight') nextImage();
+});
+
+document.getElementById('lightbox').addEventListener('click', e => { if (e.target === e.currentTarget) closeLightbox(); });
+
+document.querySelectorAll('[data-cat]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-cat]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeCategory = btn.dataset.cat;
+    renderGallery();
+  });
+});
+</script>
+</body>
+</html>

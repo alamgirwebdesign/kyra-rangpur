@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ডোনেশন - অ্যাডমিন</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css"><link rel="stylesheet" href="admin.css">
+</head>
+<body class="admin-body">
+<div id="sidebar-placeholder"></div>
+<main class="admin-main">
+  <div class="admin-header">
+    <div><h1 class="admin-title">ডোনেশন ট্র্যাকিং</h1><p class="admin-subtitle">সকল ডোনেশন দেখুন ও যাচাই করুন</p></div>
+    <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+  </div>
+
+  <!-- Summary Cards -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px">
+    <div style="background:white;border-radius:var(--radius-md);padding:20px;box-shadow:var(--shadow-sm);border-left:4px solid var(--green-light)">
+      <div style="font-size:28px;font-weight:700;color:var(--green-dark);font-family:'Noto Serif Bengali',serif" id="totalDonations">-</div>
+      <div style="font-size:13px;color:var(--text-secondary)">মোট ডোনেশন</div>
+    </div>
+    <div style="background:white;border-radius:var(--radius-md);padding:20px;box-shadow:var(--shadow-sm);border-left:4px solid var(--gold)">
+      <div style="font-size:28px;font-weight:700;color:var(--green-dark);font-family:'Noto Serif Bengali',serif" id="pendingDonations">-</div>
+      <div style="font-size:13px;color:var(--text-secondary)">পেন্ডিং</div>
+    </div>
+    <div style="background:white;border-radius:var(--radius-md);padding:20px;box-shadow:var(--shadow-sm);border-left:4px solid var(--green-bright)">
+      <div style="font-size:28px;font-weight:700;color:var(--green-dark);font-family:'Noto Serif Bengali',serif" id="confirmedAmount">৳ -</div>
+      <div style="font-size:13px;color:var(--text-secondary)">নিশ্চিত মোট পরিমাণ</div>
+    </div>
+  </div>
+
+  <!-- Filter -->
+  <div style="display:flex;gap:10px;margin-bottom:20px">
+    <select id="donationFilter" onchange="loadDonations()" style="padding:9px 14px;border:1.5px solid #e0ece3;border-radius:var(--radius-sm);font-family:'Hind Siliguri',sans-serif;font-size:14px;outline:none;">
+      <option value="">সব ডোনেশন</option>
+      <option value="pending">পেন্ডিং</option>
+      <option value="confirmed">নিশ্চিত</option>
+      <option value="rejected">প্রত্যাখ্যাত</option>
+    </select>
+  </div>
+
+  <div class="admin-card">
+    <div class="table-wrapper">
+      <table class="admin-table">
+        <thead><tr><th>দাতার নাম</th><th>ফোন</th><th>পরিমাণ</th><th>পেমেন্ট</th><th>ট্রানজেকশন ID</th><th>তারিখ</th><th>অবস্থা</th><th>কর্ম</th></tr></thead>
+        <tbody id="donationsTable"><tr><td colspan="8" class="loading-placeholder">লোড হচ্ছে...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<div class="toast"></div>
+<script src="../js/config.js"></script>
+<script src="admin.js"></script>
+<script src="sidebar.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => { initAdminPage('donations'); loadDonations(); });
+
+async function loadDonations() {
+  const tbody = document.getElementById('donationsTable');
+  const filter = document.getElementById('donationFilter').value;
+  tbody.innerHTML = '<tr><td colspan="8" class="loading-placeholder">লোড হচ্ছে...</td></tr>';
+  try {
+    const data = await adminFetch('/admin/donations');
+    if (!data.success) throw new Error();
+    let donations = data.data;
+
+    // Update summary
+    document.getElementById('totalDonations').textContent = donations.length;
+    document.getElementById('pendingDonations').textContent = donations.filter(d => d.status === 'pending').length;
+    const confirmed = donations.filter(d => d.status === 'confirmed').reduce((s, d) => s + parseFloat(d.amount||0), 0);
+    document.getElementById('confirmedAmount').textContent = '৳ ' + confirmed.toLocaleString('bn-BD');
+
+    if (filter) donations = donations.filter(d => d.status === filter);
+
+    tbody.innerHTML = donations.map(d => {
+      const date = new Date(d.created_at).toLocaleDateString('bn-BD');
+      return `
+      <tr>
+        <td>${d.donor_name || 'Anonymous'}</td>
+        <td>${d.donor_phone || '-'}</td>
+        <td style="font-weight:700;color:var(--green-dark)">৳ ${parseFloat(d.amount||0).toLocaleString('bn-BD')}</td>
+        <td>${d.payment_method || '-'}</td>
+        <td style="font-size:12px;font-family:monospace">${d.transaction_id || '-'}</td>
+        <td>${date}</td>
+        <td><span class="badge ${d.status}">${d.status === 'pending' ? 'পেন্ডিং' : d.status === 'confirmed' ? 'নিশ্চিত' : 'প্রত্যাখ্যাত'}</span></td>
+        <td>
+          ${d.status !== 'confirmed' ? `<button class="admin-btn" style="padding:5px 12px;font-size:12px" onclick="updateDonation(${d.id},'confirmed')">✓ নিশ্চিত</button>` : ''}
+          ${d.status !== 'rejected' ? `<button class="admin-btn danger" style="padding:5px 12px;font-size:12px;margin-left:4px" onclick="updateDonation(${d.id},'rejected')">✗</button>` : ''}
+        </td>
+      </tr>`;
+    }).join('') || '<tr><td colspan="8" class="loading-placeholder">কোনো ডোনেশন নেই</td></tr>';
+  } catch(e) { tbody.innerHTML = '<tr><td colspan="8" class="loading-placeholder">লোড ব্যর্থ</td></tr>'; }
+}
+
+async function updateDonation(id, status) {
+  const res = await adminFetch('/admin/donations', { method: 'PUT', body: JSON.stringify({ id, status }) });
+  if (res.success) { showToast('অবস্থা আপডেট হয়েছে'); loadDonations(); }
+  else showToast('আপডেট ব্যর্থ', 'error');
+}
+</script>
+</body>
+</html>

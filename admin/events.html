@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ইভেন্ট - অ্যাডমিন</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css"><link rel="stylesheet" href="admin.css">
+</head>
+<body class="admin-body">
+<div id="sidebar-placeholder"></div>
+<main class="admin-main">
+  <div class="admin-header">
+    <div><h1 class="admin-title">ইভেন্টসমূহ</h1><p class="admin-subtitle">ইভেন্ট যোগ, সম্পাদনা ও মুছুন</p></div>
+    <div style="display:flex;gap:10px">
+      <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+      <button class="admin-btn" onclick="openModal('eventModal')">+ নতুন ইভেন্ট</button>
+    </div>
+  </div>
+  <div class="admin-card">
+    <div class="table-wrapper">
+      <table class="admin-table">
+        <thead><tr><th>শিরোনাম</th><th>তারিখ</th><th>অবস্থান</th><th>অবস্থা</th><th>কর্ম</th></tr></thead>
+        <tbody id="eventsTable"><tr><td colspan="5" class="loading-placeholder">লোড হচ্ছে...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<!-- Modal -->
+<div class="modal-overlay" id="eventModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 id="eventModalTitle">নতুন ইভেন্ট</h3>
+      <button class="modal-close" onclick="closeModal('eventModal')">✕</button>
+    </div>
+    <form id="eventForm">
+      <input type="hidden" id="editEventId">
+      <div class="admin-form-group"><label>শিরোনাম *</label><input type="text" id="evTitle" required></div>
+      <div class="form-row">
+        <div class="admin-form-group"><label>তারিখ *</label><input type="date" id="evDate" required></div>
+        <div class="admin-form-group"><label>সময়</label><input type="time" id="evTime"></div>
+      </div>
+      <div class="form-row">
+        <div class="admin-form-group"><label>অবস্থান</label><input type="text" id="evLocation" placeholder="যেমন: রংপুর টাউন হল"></div>
+        <div class="admin-form-group"><label>অবস্থা</label>
+          <select id="evStatus">
+            <option value="upcoming">আসন্ন</option>
+            <option value="ongoing">চলমান</option>
+            <option value="completed">সম্পন্ন</option>
+          </select>
+        </div>
+      </div>
+      <div class="admin-form-group"><label>বিবরণ</label><textarea id="evDesc"></textarea></div>
+      <div class="admin-form-group"><label>কভার ছবি</label><input type="file" id="evCover" accept="image/*"></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button type="button" class="admin-btn secondary" onclick="closeModal('eventModal')">বাতিল</button>
+        <button type="submit" class="admin-btn">সংরক্ষণ</button>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="toast"></div>
+<script src="../js/config.js"></script>
+<script src="admin.js"></script>
+<script src="sidebar.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => { initAdminPage('events'); loadEvents(); });
+
+async function loadEvents() {
+  const tbody = document.getElementById('eventsTable');
+  try {
+    const data = await adminFetch('/admin/events');
+    if (!data.success) throw new Error();
+    tbody.innerHTML = data.data.map(e => `
+      <tr>
+        <td><strong>${e.title}</strong></td>
+        <td>${e.event_date}</td>
+        <td>${e.location || '-'}</td>
+        <td><span class="badge ${e.status}">${STATUS_LABELS[e.status]?.label || e.status}</span></td>
+        <td>
+          <button class="admin-btn" style="padding:6px 14px;font-size:12px" onclick='editEvent(${JSON.stringify(e).replace(/'/g,"&#39;")})'>সম্পাদনা</button>
+          <button class="admin-btn danger" style="padding:6px 14px;font-size:12px;margin-left:6px" onclick="deleteEvent(${e.id})">মুছুন</button>
+        </td>
+      </tr>`).join('') || '<tr><td colspan="5" class="loading-placeholder">কোনো ইভেন্ট নেই</td></tr>';
+  } catch(e) { tbody.innerHTML = '<tr><td colspan="5" class="loading-placeholder">লোড ব্যর্থ</td></tr>'; }
+}
+
+function editEvent(e) {
+  document.getElementById('eventModalTitle').textContent = 'ইভেন্ট সম্পাদনা';
+  document.getElementById('editEventId').value = e.id;
+  document.getElementById('evTitle').value = e.title;
+  document.getElementById('evDate').value = e.event_date;
+  document.getElementById('evTime').value = e.event_time || '';
+  document.getElementById('evLocation').value = e.location || '';
+  document.getElementById('evStatus').value = e.status;
+  document.getElementById('evDesc').value = e.description || '';
+  openModal('eventModal');
+}
+
+async function deleteEvent(id) {
+  confirmDelete('এই ইভেন্টটি মুছে ফেলতে চান?', async () => {
+    const res = await adminFetch(`/admin/events?id=${id}`, { method: 'DELETE' });
+    if (res.success) { showToast('ইভেন্ট মুছে ফেলা হয়েছে'); loadEvents(); }
+    else showToast('মুছতে ব্যর্থ', 'error');
+  });
+}
+
+document.getElementById('eventForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const id = document.getElementById('editEventId').value;
+  const data = { id, title: document.getElementById('evTitle').value, event_date: document.getElementById('evDate').value, event_time: document.getElementById('evTime').value, location: document.getElementById('evLocation').value, status: document.getElementById('evStatus').value, description: document.getElementById('evDesc').value };
+  const res = await adminFetch('/admin/events', { method: id ? 'PUT' : 'POST', body: JSON.stringify(data) });
+  if (res.success) { showToast(id ? 'ইভেন্ট আপডেট হয়েছে' : 'ইভেন্ট যোগ হয়েছে'); closeModal('eventModal'); loadEvents(); document.getElementById('editEventId').value = ''; }
+  else showToast('সংরক্ষণ ব্যর্থ', 'error');
+});
+</script>
+</body>
+</html>

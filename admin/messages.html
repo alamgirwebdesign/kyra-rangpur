@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>বার্তা - অ্যাডমিন</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css"><link rel="stylesheet" href="admin.css">
+<style>
+.messages-list { display: flex; flex-direction: column; gap: 14px; }
+.msg-card { background: white; border: 1px solid #e8f0ea; border-radius: var(--radius-md); padding: 20px 24px; cursor: pointer; transition: var(--transition); }
+.msg-card.unread { border-left: 4px solid var(--green-light); background: var(--green-bg); }
+.msg-card:hover { box-shadow: var(--shadow-sm); }
+.msg-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.msg-sender { font-weight: 700; color: var(--text-primary); font-size: 16px; }
+.msg-time { font-size: 12px; color: var(--text-secondary); }
+.msg-subject { font-size: 14px; color: var(--green-dark); font-weight: 600; margin-bottom: 6px; }
+.msg-preview { font-size: 14px; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.msg-meta { display: flex; gap: 12px; margin-top: 10px; font-size: 12px; color: var(--text-secondary); }
+.msg-body-full { margin-top: 14px; padding-top: 14px; border-top: 1px solid #e8f0ea; font-size: 15px; color: var(--text-primary); line-height: 1.7; display: none; }
+.msg-card.expanded .msg-body-full { display: block; }
+.msg-card.expanded .msg-preview { display: none; }
+</style>
+</head>
+<body class="admin-body">
+<div id="sidebar-placeholder"></div>
+<main class="admin-main">
+  <div class="admin-header">
+    <div><h1 class="admin-title">যোগাযোগ বার্তা</h1><p class="admin-subtitle">ওয়েবসাইটের মাধ্যমে আসা সকল বার্তা</p></div>
+    <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+  </div>
+
+  <div style="display:flex;gap:12px;margin-bottom:20px;align-items:center">
+    <div style="background:white;border:1px solid #e8f0ea;border-radius:var(--radius-sm);padding:10px 20px;font-size:14px">
+      মোট বার্তা: <strong id="totalMsgs">-</strong>
+    </div>
+    <div style="background:var(--green-bg);border:1px solid var(--green-pale);border-radius:var(--radius-sm);padding:10px 20px;font-size:14px;color:var(--green-dark)">
+      অপঠিত: <strong id="unreadMsgs">-</strong>
+    </div>
+  </div>
+
+  <div class="admin-card">
+    <div class="messages-list" id="messagesList">
+      <div class="loading-placeholder">লোড হচ্ছে...</div>
+    </div>
+  </div>
+</main>
+
+<div class="toast"></div>
+<script src="../js/config.js"></script>
+<script src="admin.js"></script>
+<script src="sidebar.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => { initAdminPage('messages'); loadMessages(); });
+
+async function loadMessages() {
+  const list = document.getElementById('messagesList');
+  try {
+    const data = await adminFetch('/admin/messages');
+    if (!data.success) throw new Error();
+    const msgs = data.data;
+    document.getElementById('totalMsgs').textContent = msgs.length;
+    document.getElementById('unreadMsgs').textContent = msgs.filter(m => !m.is_read).length;
+
+    if (!msgs.length) { list.innerHTML = '<div class="loading-placeholder" style="padding:40px">কোনো বার্তা নেই।</div>'; return; }
+
+    list.innerHTML = msgs.map(m => {
+      const date = new Date(m.created_at).toLocaleDateString('bn-BD');
+      return `
+      <div class="msg-card ${m.is_read ? '' : 'unread'}" onclick="this.classList.toggle('expanded')">
+        <div class="msg-header">
+          <span class="msg-sender">${m.name} ${m.is_read ? '' : '<span style="color:var(--green-light);font-size:11px">• নতুন</span>'}</span>
+          <span class="msg-time">${date}</span>
+        </div>
+        <div class="msg-subject">${m.subject || 'বিষয়হীন'}</div>
+        <div class="msg-preview">${m.message}</div>
+        <div class="msg-body-full">${m.message}</div>
+        <div class="msg-meta">
+          ${m.email ? `<span>✉️ ${m.email}</span>` : ''}
+          ${m.phone ? `<span>📞 ${m.phone}</span>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) { list.innerHTML = '<div class="loading-placeholder">লোড ব্যর্থ</div>'; }
+}
+</script>
+</body>
+</html>
